@@ -1,0 +1,137 @@
+########################################################################
+########################################################################
+## Uniform Distribution
+########################################################################
+########################################################################
+dunif(x=0.20,min=0,max=1) #This the height of the PDF at x=0.20
+punif(q=0.20,min=0,max=1) #P(X<=0.20|a=0,b=1)
+qunif(p=0.90,min=0,max=1) #The 90th percentile
+runif(n=5,min=0,max=1) #A random sample of 5 Xi~Uniform(a=0,b=1)
+
+
+par(mfrow=c(1,2))
+#####Plots
+#PDF
+x<-seq(from=-.5,to=1.5,by=0.001)
+fx<-dunif(x=x,min=0,max=1)
+#type="l" yields a line
+plot(x,fx,type="l",xlab="X",ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+#CDF
+x<-seq(from=-.5,to=1.5,by=0.001)
+Fx<-punif(q=x,min=0,max=1)
+plot(x,Fx,type="l",xlab="X",ylab=bquote(F[x](x)))
+abline(h=0) #adds the x-axis
+
+#####Example Q1
+par(mfrow=c(1,2))
+#####Plots
+#PDF
+x<-seq(from=-.5,to=1.5,by=0.001)
+fx<-dunif(x=x,min=0,max=1)
+#type="l" yields a line
+plot(x,fx,type="l",xlab="Pseudo Random Number (X)",ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+#The following highlights the area of interest from the
+#integral. Note that we put an extra point at each end
+#to get a nicely shaded graph.For instance, c(0.80,x[x>=0.80],1)
+#is the starting point 0.80, the interval [0.80,1], and the
+#ending point 1 and c(0,fx[x>=0.80],0 ) ensures the 
+#shaded region is `grounded' at the x axis (y=0)
+polygon(c(0.80,x[x>=0.80],1),  c(0,fx[x>=0.80],0 ), col="lightblue")
+
+#CDF
+x<-seq(from=-.5,to=1.5,by=0.001)
+Fx<-punif(q=x,min=0,max=1)
+plot(x,Fx,type="l",xlab="Pseudo Random Number (X)",ylab=bquote(F[x](x)))
+abline(h=0) #adds the x-axis
+points(x=0.80,y=punif(q=0.80,min=0,max=1),pch=16,col="red")
+
+########################################################################
+########################################################################
+## Gaussian Distribution
+########################################################################
+########################################################################
+dnorm(x=0.20,mean=0,sd=1) #This the height of the PDF at x=0.20
+pnorm(q=2,mean=0,sd=1) #P(X<=2|mu=0,sigma=1)
+qnorm(p=0.90,mean=0,sd=1) #The 90th percentile
+rnorm(n=5,mean=0,sd=1) #A random sample of 5 Xi~Gaussian(mu=0,sigma=1)
+
+
+par(mfrow=c(1,2))
+#####Plots
+#PDF
+x<-seq(from=-4,to=4,by=0.001)
+fx<-dnorm(x=x,mean=0,sd=1)
+#type="l" yields a line
+plot(x,fx,type="l",xlab="X",ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+#CDF
+x<-seq(from=-4,to=4,by=0.001)
+Fx<-pnorm(q=x,mean=0,sd=1)
+plot(x,Fx,type="l",xlab="X",ylab=bquote(F[x](x)))
+abline(h=0) #adds the x-axis
+
+#####Example Q1
+1-pnorm(q=40,mean=45.5,sd=3.92) #Complement Rule
+pnorm(q=40,mean=45.5,sd=3.92,lower.tail=FALSE) #Ask Directly
+
+par(mfrow=c(1,2))
+#####Plots
+#PDF
+x<-seq(from=29,to=62,by=0.001)
+fx<-dnorm(x=x,mean=45.5,sd=3.92)
+#type="l" yields a line
+plot(x,fx,type="l",xlab="Housefly Wingspan in mm (X)",ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+polygon(c(40,x[x>=40],62),  c(0,fx[x>=40],0 ), col="lightblue")
+
+#CDF
+x<-seq(from=29,to=62,by=0.001)
+Fx<-pnorm(q=x,mean=45.5,sd=3.92)
+plot(x,Fx,type="l",xlab="Housefly Wingspan in mm (X)",ylab=bquote(F[x](x)))
+abline(h=0) #adds the x-axis
+points(x=40,y=pnorm(q=40,mean=45.5,sd=3.92),pch=16,col="red")
+
+#####Example Q2
+pnorm(q=50,mean=45.5,sd=3.92)
+
+par(mfrow=c(1,2))
+#####Plots
+#PDF
+x<-seq(from=29,to=62,by=0.001)
+fx<-dnorm(x=x,mean=45.5,sd=3.92)
+#type="l" yields a line
+plot(x,fx,type="l",xlab="Housefly Wingspan in mm (X)",ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+polygon(c(29,x[x<=50],50),  c(0,fx[x<=50],0 ), col="lightblue")
+
+#CDF
+x<-seq(from=29,to=62,by=0.001)
+Fx<-pnorm(q=x,mean=45.5,sd=3.92)
+plot(x,Fx,type="l",xlab="Housefly Wingspan in mm (X)",ylab=bquote(F[x](x)))
+abline(h=0) #adds the x-axis
+points(x=50,y=pnorm(q=50,mean=45.5,sd=3.92),pch=16,col="red")
+
+
+#####Example Q2
+pnorm(q=40,mean=45.5,sd=3.92) + (1-pnorm(q=50,mean=45.5,sd=3.92))
+
+par(mfrow=c(1,2))
+#####Plots
+#PDF
+x<-seq(from=29,to=62,by=0.001)
+fx<-dnorm(x=x,mean=45.5,sd=3.92)
+#type="l" yields a line
+plot(x,fx,type="l",xlab="Housefly Wingspan in mm (X)",ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+polygon(c(29,x[x<=40],40),  c(0,fx[x<=40],0 ), col="lightblue")
+polygon(c(50,x[x>=50],62),  c(0,fx[x>=50],0 ), col="lightblue")
+
+#CDF
+x<-seq(from=29,to=62,by=0.001)
+Fx<-pnorm(q=x,mean=45.5,sd=3.92)
+plot(x,Fx,type="l",xlab="Housefly Wingspan in mm (X)",ylab=bquote(F[x](x)))
+abline(h=0) #adds the x-axis
+points(x=40,y=pnorm(q=40,mean=45.5,sd=3.92),pch=16,col="red")
+points(x=50,y=pnorm(q=50,mean=45.5,sd=3.92),pch=16,col="red")

@@ -1,0 +1,497 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+###Poisson Simulation
+########################################################################
+x.poisson1<-rpois(n=500,lambda=10)
+x.poisson2<-rpois(n=500,lambda=10)
+x.poisson3<-rpois(n=500,lambda=10)
+x.poisson4<-rpois(n=500,lambda=10)
+x.poisson5<-rpois(n=500,lambda=10)
+
+xbar.cumulative1<-cumsum(x.poisson1)/1:500
+xbar.cumulative2<-cumsum(x.poisson2)/1:500
+xbar.cumulative3<-cumsum(x.poisson3)/1:500
+xbar.cumulative4<-cumsum(x.poisson4)/1:500
+xbar.cumulative5<-cumsum(x.poisson5)/1:500
+
+library("TTR")
+ssq.cumulative1<-runSD(x=x.poisson1,n = 1,cumulative=TRUE)^2
+ssq.cumulative2<-runSD(x=x.poisson2,n = 1,cumulative=TRUE)^2
+ssq.cumulative3<-runSD(x=x.poisson3,n = 1,cumulative=TRUE)^2
+ssq.cumulative4<-runSD(x=x.poisson4,n = 1,cumulative=TRUE)^2
+ssq.cumulative5<-runSD(x=x.poisson5,n = 1,cumulative=TRUE)^2
+
+ggdat<-data.frame(x=1:500,
+                  y1=xbar.cumulative1,
+                  y2=xbar.cumulative2,
+                  y3=xbar.cumulative3,
+                  y4=xbar.cumulative4,
+                  y5=xbar.cumulative5)
+g1<-ggplot(data=ggdat, aes(x=x,y=y1))+
+  geom_line()+
+  geom_line(aes(y=y2),color=2)+
+  geom_line(aes(y=y3),color=3)+
+  geom_line(aes(y=y4),color=4)+
+  geom_line(aes(y=y5),color=5)+
+  geom_hline(yintercept = 10)+
+  theme_bw()+
+  xlab("Observation")+
+  ylab("Cumulative Sample Mean")+
+  ggtitle("Law of Large Numbers",subtitle=bquote({bar(X[n])~"approaches"~E(X)==lambda}==10~"as n increases"))
+
+ggdat<-data.frame(x=1:500,
+                  y1=ssq.cumulative1,
+                  y2=ssq.cumulative2,
+                  y3=ssq.cumulative3,
+                  y4=ssq.cumulative4,
+                  y5=ssq.cumulative5)
+g2<-ggplot(data=ggdat, aes(x=x,y=y1))+
+  geom_line()+
+  geom_line(aes(y=y2),color=2)+
+  geom_line(aes(y=y3),color=3)+
+  geom_line(aes(y=y4),color=4)+
+  geom_line(aes(y=y5),color=5)+
+  geom_hline(yintercept = 10)+
+  theme_bw()+
+  xlab("Observation")+
+  ylab("Cumulative Sample Mean")+
+  ggtitle("Law of Large Numbers",subtitle=bquote({s[n]^2~"approaches"~var(X)==lambda}==10~"as n increases"))
+
+grid.arrange(g1,g2,ncol=2)
+
+########################################################################
+###Lifetimes
+########################################################################
+dat.battery<-c(4285,2066,2584,1009,318,1429,981,1402,1137,414,
+       564, 604, 14, 4152, 737, 852, 1560, 1786, 520, 396,
+       1278,209, 349, 478, 3032, 1461, 701, 1406, 261, 83,
+       205, 602, 3770, 726, 3894, 2662, 497, 35, 2778, 1379,
+       3920, 1379, 99, 510, 582, 308, 3367, 99, 373, 4540)
+ggdat<-data.frame(lifetime=dat.battery)
+
+
+g1<-ggplot(data=ggdat,aes(x=lifetime))+
+  geom_histogram(aes(y=..density..),bins=10,color="black",fill="lightblue")+
+  geom_hline(yintercept=0)+
+  geom_density(color="red")+
+  theme_bw()+
+  xlab("Battery Lifetime (in hours)")+
+  ylab("Density")
+g1  
+
+
+ggdat.density<-data.frame(x=seq(0,5000,1),
+                          f1=dexp(x=seq(0,5000,1), rate = 1/1100),
+                          f2=dexp(x=seq(0,5000,1), rate = 1/1200),
+                          f3=dexp(x=seq(0,5000,1), rate = 1/1300),
+                          f4=dexp(x=seq(0,5000,1), rate = 1/1400),
+                          f5=dexp(x=seq(0,5000,1), rate = 1/1500))
+g2<-ggplot(data=ggdat,aes(x=lifetime))+
+  geom_histogram(aes(y=..density..),bins=10,color="black",fill="lightblue")+
+  geom_hline(yintercept=0)+
+  geom_line(data=ggdat.density,aes(x=x,y=f1,color="lambda1"))+
+  geom_line(data=ggdat.density,aes(x=x,y=f2,color="lambda2"))+
+  geom_line(data=ggdat.density,aes(x=x,y=f3,color="lambda3"))+
+  geom_line(data=ggdat.density,aes(x=x,y=f4,color="lambda4"))+
+  geom_line(data=ggdat.density,aes(x=x,y=f5,color="lambda5"))+
+  theme_bw()+
+  xlab("Battery Lifetime (in hours)")+
+  ylab("Density")+
+  scale_color_discrete("",
+                     labels=c(bquote(lambda==1000),bquote(lambda==2000),bquote(lambda==3000),
+                                   bquote(lambda==4000),bquote(lambda==5000)))
+g2
+
+
+grid.arrange(g1,g2,ncol=2)
+
+mean(dat.battery)
+var(dat.battery)
+sd(dat.battery)
+
+########################################################################
+###Uniform(0,b)
+########################################################################
+n<-5000
+x.uniform0b<-runif(n=n,min=0,max=3)
+max(x)
+
+ggdat<-data.frame(x=x.uniform0b)
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_histogram(aes(y=..density..),breaks=seq(0,3,0.5),color="black",fill="lightblue")+
+  geom_hline(yintercept=0)+
+  geom_density(color="red")+
+  theme_bw()+
+  xlab("X")+
+  ylab("Density")+
+  ggtitle("Data from Uniform(0,b)",subtitle="Where b is unknown")
+
+ggdat<-data.frame(x=1:5000,
+                  y=2*cumsum(x.uniform0b)/1:5000) #cumulative 2*xbar
+g2<-ggplot(data=ggdat,aes(x=x,y=y))+
+  geom_line()+
+  geom_hline(yintercept = 3, color="red", linetype="dashed")+
+  theme_bw()+
+  xlab("Observation")+
+  ylab(bquote(2*bar(X)[n]))
+grid.arrange(g1,g2,ncol=2)
+
+##Method of moments using R
+g<-function(theta,dat.x){ #(theta,x) order is important
+  #unknown parameter is b
+  b<-theta
+  EX<- (0+b)/2 #expected value of uniform distribution
+  EX - mean(dat.x)
+}
+library(nleqslv)
+nleqslv(fn = g, #function(s) we want to solve for 0
+        x=c(max(x.uniform0b)),#reasonable starting guess for b
+        dat.x=x.uniform0b) #pass data in
+2*mean(x.uniform0b)
+########################################################################
+###Uniform(-theta,theta)
+########################################################################
+n<-5000
+x.uniformtt<-runif(n=n,min=-3,max=3)
+max(x)
+
+ggdat<-data.frame(x=x.uniformtt)
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_histogram(aes(y=..density..),breaks=seq(-3,3,0.5),color="black",fill="lightblue")+
+  geom_hline(yintercept=0)+
+  geom_density(color="red")+
+  theme_bw()+
+  xlab("X")+
+  ylab("Density")+
+  ggtitle(bquote("Data from Uniform("-theta*","*theta*")"),subtitle=bquote("Where"~theta~"is unknown"))
+
+ggdat<-data.frame(x=1:5000,
+                  y=sqrt(3*cumsum(x.uniformtt^2)/1:5000)) #cumulative 2*xbar
+g2<-ggplot(data=ggdat,aes(x=x,y=y))+
+  geom_line()+
+  geom_hline(yintercept = 3, color="red", linetype="dashed")+
+  theme_bw()+
+  xlab("Observation")+
+  ylab(bquote(sqrt((3/n)* sum(x[i]^2,i==1,n))))
+grid.arrange(g1,g2,ncol=2)
+
+##Method of moments using R
+g<-function(theta,dat.x){ #(theta,x) order is important
+  #unknown parameter is theta
+  #EX<- (a+b)/2 = 0 here
+  VARX<- (theta-(-1*theta))^2/12 #variance of a uniform distribution
+  VARX - var(dat.x) 
+}
+
+nleqslv(fn = g, #function(s) we want to solve for 0
+        x=c(max(x)),#reasonable starting guess for b
+        dat.x=x.uniformtt) #pass data in
+sqrt((3/5000)*sum(x.uniformtt^2))
+########################################################################
+###Uniform(a,b)
+########################################################################
+n<-5000
+x.uniformab<-runif(n=n,min=-1,max=5)
+min(x)
+max(x)
+
+ggdat<-data.frame(x=x.uniformab)
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_histogram(aes(y=..density..),breaks=seq(-1,5,0.5),color="black",fill="lightblue")+
+  geom_hline(yintercept=0)+
+  geom_density(color="red")+
+  theme_bw()+
+  xlab("X")+
+  ylab("Density")+
+  ggtitle(bquote("Data from Uniform(a,b)"),subtitle=bquote("Where"~a~"and"~b~"are unknown"))
+
+ggdat<-data.frame(x=1:5000,
+                  a=(cumsum(x.uniformab)/1:5000) - sqrt(3*((cumsum(x.uniformab^2)/1:5000)-(cumsum(x.uniformab)/1:5000)^2)),
+                  b=(cumsum(x.uniformab)/1:5000) + sqrt(3*((cumsum(x.uniformab^2)/1:5000)-(cumsum(x.uniformab)/1:5000)^2)))
+g2<-ggplot(data=ggdat,aes(x=x,y=a))+
+  geom_line(aes(color="a"))+
+  geom_hline(yintercept = -1, color="black", linetype="dashed")+
+  geom_line(aes(y=b,color="b"))+
+  geom_hline(yintercept = 5, color="black", linetype="dashed")+
+  theme_bw()+
+  xlab("Observation")+
+  ylab("Cumulative Estimates")+
+  scale_color_manual("",breaks=c("a","b"),values=c("blue","red"))
+grid.arrange(g1,g2,ncol=2)
+
+##Method of moments using R
+g<-function(theta,dat.x){
+  a<-theta[1]
+  b<-theta[2]
+  EX<- (a+b)/2 #expected value of a uniform distribution
+  VARX<- (b-a)^2/12 #variance of a uniform distribution
+  eq1<- EX - mean(dat.x)
+  eq2<- VARX - var(dat.x)
+  c(eq1,eq2)
+}
+
+library(nleqslv)
+nleqslv(fn = g, #function(s) we want to solve =c(0,0)
+        x=c(min(x.uniformab),max(x.uniformab)),#starting guess
+        dat.x=x.uniformab) #pass data in
+mean(x.uniformab) - sqrt(3*var(x.uniformab))  #a
+mean(x.uniformab) + sqrt(3*var(x.uniformab))  #b
+
+
+
+########################################################################
+###Battery Lifetimes
+########################################################################
+ggdat<-data.frame(lifetime=dat.battery)
+ggdat.density<-data.frame(x=seq(0,5000,1),
+                          f1=dexp(x=seq(0,5000,1), rate = 1/mean(dat.battery)))
+g1<-ggplot(data=ggdat,aes(x=lifetime))+
+  geom_histogram(aes(y=..density..),bins=10,color="black",fill="lightblue")+
+  geom_hline(yintercept=0)+
+  geom_line(data=ggdat.density,aes(x=x,y=f1),color="red")+
+  theme_bw()+
+  xlab("Battery Lifetime (in hours)")+
+  ylab("Density")+
+  ggtitle(bquote("Data from Exponential"(lambda)),subtitle = bquote("Where"~lambda~"is unknown"))
+
+library("TTR")
+ggdat<-data.frame(x=1:length(dat.battery),
+                  lambda.xbar=1/(cumsum(dat.battery)/1:length(dat.battery)))
+
+g2<-ggplot(data=ggdat,aes(x=x,y=lambda.xbar))+
+  geom_line()+
+  theme_bw()+
+  xlab("Observation")+
+  ylab(bquote(1/bar(x)[n]))
+grid.arrange(g1,g2,ncol=2)
+
+
+##Method of moments using R
+g<-function(theta,dat.x){
+  lambda<-theta
+  EX<- 1/lambda #expected value of an exponential distribution
+  EX-mean(dat.x)
+}
+
+library(nleqslv)
+nleqslv(fn = g, #function(s) we want to solve =c(0,0)
+        x=1/mean(dat.battery),#starting guess
+        dat.x=dat.battery) #pass data in
+1/mean(dat.battery)
+
+
+########################################################################
+###Uniform(0,b) MLE
+########################################################################
+uniform.LL<-function(x,theta,neg=FALSE){
+  b<-theta
+  LL<- sum(dunif(x=x,min=0,max=b,log=TRUE))
+  ifelse(!neg,LL,-LL)
+}
+
+(maximization<-optim(fn=uniform.LL, #function to optimize
+      x=x.uniform0b,
+      par = max(x.uniform0b), #reasonable guess for b
+      method = "Brent", #univariate optimizer
+      lower = 0, #lower bound for b
+      upper = 10, #reasonable upper bound for b
+      neg=TRUE)) #optim minimizes so we want the negative log-likelihood
+
+ggdat<-data.frame(theta=seq(0,10,0.01),
+                  LL= sapply(X=seq(0,10,0.01),FUN=uniform.LL,x=x.uniform0b,neg=FALSE),
+                  nLL= sapply(X=seq(0,10,0.01),FUN=uniform.LL,x=x.uniform0b,neg=TRUE))
+ggdat.highlight<-data.frame(x=maximization$par,
+                            y=uniform.LL(x=x.uniform0b,theta=maximization$par,neg=FALSE))
+g1<-ggplot(data=ggdat,aes(x=theta,y=LL))+
+  geom_line()+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y),color="red")+
+  theme_bw()+
+  xlab(bquote(b))+
+  ylab(bquote(log(L(blx))))+
+  ggtitle("Log Likelihood Function",subtitle="Parameter b given fixed sample")
+
+ggdat.highlight<-data.frame(x=maximization$par,
+                            y=uniform.LL(x=x.uniform0b,theta=maximization$par,neg=TRUE))
+g2<-ggplot(data=ggdat,aes(x=theta,y=nLL))+
+  geom_line()+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y),color="red")+
+  theme_bw()+
+  xlab(bquote(b))+
+  ylab(bquote(log(L(blx))))+
+  ggtitle("Negative Log Likelihood Function",subtitle="Parameter b given fixed sample")
+
+grid.arrange(g1,g2,ncol=2)
+
+########################################################################
+###Uniform(-theta,theta) MLE
+########################################################################
+uniform.LL<-function(x,theta,neg=FALSE){
+  LL<- sum(dunif(x=x,min=-theta,max=theta,log=TRUE))
+  ifelse(!neg,LL,-LL)
+}
+(maximization<-optim(fn=uniform.LL, #function to optimize
+                     x=x.uniformtt,
+                     par = max(abs(min(x.uniformtt)),max(x.uniformtt)), #reasonable guess for theta
+                     method = "Brent", #univariate optimizer
+                     lower = 0, #lower bound for theta
+                     upper = 10, #reasonable upper bound for theta
+                     neg=TRUE)) #optim minimizes so we want the negative log-likelihood
+
+ggdat<-data.frame(theta=seq(0,10,0.01),
+                  LL= sapply(X=seq(0,10,0.01),FUN=uniform.LL,x=x.uniformtt,neg=FALSE),
+                  nLL= sapply(X=seq(0,10,0.01),FUN=uniform.LL,x=x.uniformtt,neg=TRUE))
+ggdat.highlight<-data.frame(x=maximization$par,
+                            y=uniform.LL(x=x.uniformtt,theta=maximization$par,neg=FALSE))
+g1<-ggplot(data=ggdat,aes(x=theta,y=LL))+
+  geom_line()+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y),color="red")+
+  theme_bw()+
+  xlab(bquote(theta))+
+  ylab(bquote(log(L(theta*lx))))+
+  ggtitle("Log Likelihood Function",subtitle=bquote("Parameter"~theta~"given fixed sample"))
+
+ggdat.highlight<-data.frame(x=maximization$par,
+                            y=uniform.LL(x=x.uniformtt,theta=maximization$par,neg=TRUE))
+g2<-ggplot(data=ggdat,aes(x=theta,y=nLL))+
+  geom_line()+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y),color="red")+
+  theme_bw()+
+  xlab(bquote(theta))+
+  ylab(bquote(log(L(theta*lx))))+
+  ggtitle("Negative Log Likelihood Function",subtitle=bquote("Parameter"~theta~"given fixed sample"))
+
+grid.arrange(g1,g2,ncol=2)
+
+########################################################################
+###Uniform(a,b) MLE
+########################################################################
+uniform.LL<-function(x,theta,neg=FALSE){
+  a<-theta[1]
+  b<-theta[2]
+  LL<- sum(dunif(x=x,min=a,max=b,log=TRUE))
+  ifelse(!neg,LL,-LL)
+}
+(maximization<-optim(fn=uniform.LL, #function to optimize
+                     x=x.uniformab,
+                     par = c(min(x.uniformab),max(x.uniformab)), #reasonable guess for a and b
+                     neg=TRUE)) #optim minimizes so we want the negative log-likelihood
+
+a<-seq(-5,5,0.1)
+b<-seq(0,10,0.1)
+theta<-expand.grid(a,b)
+ll<-apply(X=theta,FUN=uniform.LL,MARGIN=1,x=x.uniformab,neg=FALSE)
+nll<-apply(X=theta,FUN=uniform.LL,MARGIN=1,x=x.uniformab,neg=TRUE)
+ggdat<-data.frame(a=theta[,1],b=theta[,2],ll=ll,nll=nll)
+ggdat.highlight<-data.frame(a=maximization$par[1],
+                  b=maximization$par[2],
+                  ll=uniform.LL(x=x.uniformab,theta=maximization$par,neg=FALSE),
+                  nll=uniform.LL(x=x.uniformab,theta=maximization$par,neg=TRUE))
+library(viridis) #for a nicer pallete
+g1<-ggplot(ggdat, aes(x=a,y=b,z=ll, fill=ll)) + 
+  geom_raster(aes(fill = ll)) +
+  geom_contour(colour = "white")+
+  geom_point(data=ggdat.highlight,aes(x=a,y=b,z=ll),color="red",show.legend = FALSE)+
+  scale_fill_viridis()+
+  theme_bw()+
+  ggtitle("Log Likelihood Function",
+          subtitle="Parameters a and b given a fixed sample")+
+  guides(fill=guide_legend(title="Log Likelihood"))
+
+g2<-ggplot(ggdat, aes(x=a,y=b,z=nll, fill=nll)) + 
+  geom_raster(aes(fill = nll)) +
+  geom_contour(colour = "white")+
+  geom_point(data=ggdat.highlight,aes(x=a,y=b,z=nll),color="red",show.legend = FALSE)+
+  scale_fill_viridis()+
+  theme_bw()+
+  ggtitle("Negative Log Likelihood Function",
+          subtitle="Parameters a and b given a fixed sample")+
+  guides(fill=guide_legend(title="Negative Log Likelihood"))
+
+grid.arrange(g1,g2,ncol=2)
+########################################################################
+###Exponential(lambda) MLE
+########################################################################
+exp.LL<-function(x,theta,neg=FALSE){
+  lambda<-theta
+  LL<- sum(dexp(x=x,rate=lambda,log=TRUE))
+  ifelse(!neg,LL,-LL)
+}
+(maximization<-optim(fn=exp.LL, #function to optimize
+                     x=dat.battery,
+                     par = 1/mean(dat.battery), #reasonable guess for lambda
+                     method = "Brent", #univariate optimizer
+                     lower = 0, #lower bound for lambda
+                     upper = 1, #reasonable upper bound for lambda
+                     neg=TRUE)) #optim minimizes so we want the negative log-likelihood
+
+ggdat<-data.frame(theta=seq(0,1,0.0001),
+                  LL= sapply(X=seq(0,1,0.0001),FUN=exp.LL,x=dat.battery,neg=FALSE),
+                  nLL= sapply(X=seq(0,1,0.0001),FUN=exp.LL,x=dat.battery,neg=TRUE))
+ggdat.highlight<-data.frame(x=maximization$par,
+                            y=exp.LL(x=dat.battery,theta=maximization$par,neg=FALSE))
+g1<-ggplot(data=ggdat,aes(x=theta,y=LL))+
+  geom_line()+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y),color="red")+
+  theme_bw()+
+  xlab(bquote(lambda))+
+  ylab(bquote(log(L(lambda*lx))))+
+  ggtitle("Log Likelihood Function",subtitle=bquote("Parameter"~lambda~"given fixed sample"))
+
+ggdat.highlight<-data.frame(x=maximization$par,
+                            y=exp.LL(x=dat.battery,theta=maximization$par,neg=TRUE))
+g2<-ggplot(data=ggdat,aes(x=theta,y=nLL))+
+  geom_line()+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y),color="red")+
+  theme_bw()+
+  xlab(bquote(lambda))+
+  ylab(bquote(log(L(lambda*lx))))+
+  ggtitle("Negative Log Likelihood Function",subtitle=bquote("Parameter"~lambda~"given fixed sample"))
+
+grid.arrange(g1,g2,ncol=2)
+
+########################################################################
+###Uniform(0,b) Simulation
+########################################################################
+mom<-rep(NA,1000)
+mle<-rep(NA,1000)
+for(i in 1:1000){
+  n<-1000
+  x<-runif(n=n,min=0,max=3)
+  mom[i]<-2*mean(x)
+  mle[i]<-max(x)
+}
+
+ggdata<-data.frame(mom=mom,
+                   mle=mle)
+
+g1<-ggplot(data=ggdata,aes(x=mom))+
+  geom_histogram(aes(y=..density..),col="black",fill="lightblue")+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab(bquote("Method of Moments Estimator"~(hat(b))))+
+  ylab("Density")+
+  ggtitle("Method of Moment Estimates",
+          subtitle=bquote("For data from"~X~"~ Uniform(0,b=3)"))
+g2<-ggplot(data=ggdata,aes(x=mle))+
+  geom_histogram(aes(y=..density..),col="black",fill="lightblue")+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab(bquote("Maximum Likelihood Estimator"~(hat(b))))+
+  ylab("Density")+
+  ggtitle("Maximum Likelihood Estimates",
+          subtitle=bquote("For data from"~X~"~ Uniform(0,b=3)"))
+
+grid.arrange(g1,g2,ncol=2)
+
+c(mean=mean(mom),variance=var(mom))
+c(mean=mean(mle),variance=var(mle))
+
+(bias.mom<-mean(mom-3))
+(bias.mle<-mean(mle-3))
+  
+(precision.mom<-1/var(mom))
+(precision.mle<-1/var(mle))
+
+(MSE.mom<- var(mom) + bias.mom^2)
+(MSE.mle<- var(mle) + bias.mle^2)

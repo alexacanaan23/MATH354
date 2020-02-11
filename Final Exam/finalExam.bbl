@@ -1,0 +1,54 @@
+\begin{thebibliography}{}
+
+\bibitem[Auguie, 2017]{gridExtra}
+Auguie, B. (2017).
+\newblock {\em gridExtra: Miscellaneous Functions for "Grid" Graphics}.
+\newblock R package version 2.3.
+
+\bibitem[Bracht et~al., 2016]{Bracht16}
+Bracht, T., Molleken, C., Ahrens, M., Poschmann, G., Schlosser, A., Eisenacher,
+  M., Stuhler, K., Meyer, H.~E., Schmiegel, W.~H., Holmskov, U., Sorensen,
+  G.~L., and Sitek, B. (2016).
+\newblock Evaluation of the biomarker candidate mfap4 for non-invasive
+  assessment of hepatic fibrosis in hepatitis c patients.
+\newblock {\em Journal of Translational Medicine}, 14.
+
+\bibitem[Grolemund and Wickham, 2011]{lubridate}
+Grolemund, G. and Wickham, H. (2011).
+\newblock Dates and times made easy with {lubridate}.
+\newblock {\em Journal of Statistical Software}, 40(3):1--25.
+
+\bibitem[Hervé, 2019]{RVAideMemoire}
+Hervé, M. (2019).
+\newblock {\em RVAideMemoire: Testing and Plotting Procedures for
+  Biostatistics}.
+\newblock R package version 0.9-73.
+
+\bibitem[Leeper, 2018]{margins}
+Leeper, T.~J. (2018).
+\newblock {\em margins: Marginal Effects for Model Objects}.
+\newblock R package version 0.3.23.
+
+\bibitem[Lüdecke, 2018]{ggeffects}
+Lüdecke, D. (2018).
+\newblock ggeffects: Tidy data frames of marginal effects from regression
+  models.
+\newblock {\em Journal of Open Source Software}, 3(26):772.
+
+\bibitem[Mangiafico, 2018]{rcompanion}
+Mangiafico, S. (2018).
+\newblock {\em rcompanion: Functions to Support Extension Education Program
+  Evaluation}.
+\newblock R package version 1.13.2.
+
+\bibitem[Schaarschmidt and Gerhard, 2019]{pairwiseCI}
+Schaarschmidt, F. and Gerhard, D. (2019).
+\newblock {\em pairwiseCI: Confidence Intervals for Two Sample Comparisons}.
+\newblock R package version 0.1-27.
+
+\bibitem[Wickham, 2016]{ggplot2}
+Wickham, H. (2016).
+\newblock {\em ggplot2: Elegant Graphics for Data Analysis}.
+\newblock Springer-Verlag New York.
+
+\end{thebibliography}

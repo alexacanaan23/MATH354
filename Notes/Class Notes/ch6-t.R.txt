@@ -1,0 +1,57 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### Student T Distribution
+########################################################################
+dt(x=0.50,df=10) #This the height of the PDF at x=0.50
+pt(q=0.250,df=10) #P(X<=0.0.250|v=10)
+qt(p=0.90,df=10) #The 90th percentile
+rt(n=5,df=10) #A random sample of 5 Xi~t(v=10)
+
+ggdat<-data.frame(x=seq(-4,4,0.001),
+                  f1=dt(x=seq(-4,4,0.001),df=1),
+                  f2=dt(x=seq(-4,4,0.001),df=3),
+                  f3=dt(x=seq(-4,4,0.001),df=5),
+                  f4=dt(x=seq(-4,4,0.001),df=15),
+                  f5=dt(x=seq(-4,4,0.001),df=30),
+                  fnorm<-dnorm(x=seq(-4,4,0.001),mean=0,sd=1))
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=f1,color="df=1"))+
+  geom_line(aes(y=f2,color="df=5"))+
+  geom_line(aes(y=f3,color="df=15"))+
+  geom_line(aes(y=f4,color="df=30"))+
+  geom_line(aes(y=f5,color="df=50"))+
+  geom_line(aes(y=fnorm,color="Standard Normal"),linetype="dashed",size=1.5)+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Student T PDF",subtitle="For Various Parameter Values")+
+  scale_color_discrete("",breaks=c("df=1","df=5","df=15","df=30","df=50","Standard Normal"),
+                       labels=c(bquote(v==1),bquote(v==5),bquote(v==15),
+                                bquote(v==30),bquote(v==50),"Standard Normal"))
+
+ggdat<-data.frame(x=seq(-4,4,0.001),
+                  F1=pt(q=seq(-4,4,0.001),df=1),
+                  F2=pt(q=seq(-4,4,0.001),df=3),
+                  F3=pt(q=seq(-4,4,0.001),df=5),
+                  F4=pt(q=seq(-4,4,0.001),df=15),
+                  F5=pt(q=seq(-4,4,0.001),df=30),
+                  Fnorm<-pnorm(q=seq(-4,4,0.001),mean=0,sd=1))
+g1.cdf<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=F1,color="df=1"))+
+  geom_line(aes(y=F2,color="df=5"))+
+  geom_line(aes(y=F3,color="df=15"))+
+  geom_line(aes(y=F4,color="df=30"))+
+  geom_line(aes(y=F5,color="df=50"))+
+  geom_line(aes(y=Fnorm,color="Standard Normal"),linetype="dashed",size=1.5)+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Student T CDF",subtitle="For Various Parameter Values")+
+  scale_color_discrete("",breaks=c("df=1","df=5","df=15","df=30","df=50","Standard Normal"),
+                       labels=c(bquote(v==1),bquote(v==5),bquote(v==15),
+                                bquote(v==30),bquote(v==50),"Standard Normal"))
+
+grid.arrange(g1,g1.cdf,ncol=2)

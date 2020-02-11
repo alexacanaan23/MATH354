@@ -1,0 +1,54 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### chi-squared Distribution
+########################################################################
+dchisq(x=0.50,df=10) #This the height of the PDF at x=0.50
+pchisq(q=0.250,df=10) #P(X<=0.0.250|v=10)
+qchisq(p=0.90,df=10) #The 90th percentile
+rchisq(n=5,df=10) #A random sample of 5 Xi~chisq(v=10)
+
+ggdat<-data.frame(x=seq(0,10,0.001),
+                  f1=dchisq(x=seq(0,10,0.001),df=1),
+                  f2=dchisq(x=seq(0,10,0.001),df=3),
+                  f3=dchisq(x=seq(0,10,0.001),df=5),
+                  f4=dchisq(x=seq(0,10,0.001),df=8),
+                  f5=dchisq(x=seq(0,10,0.001),df=10))
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=f1,color="df=1"))+
+  geom_line(aes(y=f2,color="df=3"))+
+  geom_line(aes(y=f3,color="df=5"))+
+  geom_line(aes(y=f4,color="df=8"))+
+  geom_line(aes(y=f5,color="df=10"))+
+  geom_hline(yintercept=0)+
+  ylim(0,1)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Chi-squared PDF",subtitle="For Various Parameter Values")+
+  scale_color_discrete("",breaks=c("df=1","df=3","df=5","df=8","df=10"),
+                       labels=c(bquote(v==1),bquote(v==3),bquote(v==5),
+                                bquote(v==8),bquote(v==10)))
+
+ggdat<-data.frame(x=seq(0,10,0.001),
+                  F1=pchisq(q=seq(0,10,0.001),df=1),
+                  F2=pchisq(q=seq(0,10,0.001),df=3),
+                  F3=pchisq(q=seq(0,10,0.001),df=5),
+                  F4=pchisq(q=seq(0,10,0.001),df=8),
+                  F5=pchisq(q=seq(0,10,0.001),df=10))
+g1.cdf<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=F1,color="df=1"))+
+  geom_line(aes(y=F2,color="df=3"))+
+  geom_line(aes(y=F3,color="df=5"))+
+  geom_line(aes(y=F4,color="df=8"))+
+  geom_line(aes(y=F5,color="df=10"))+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Chi-squared CDF",subtitle="For Various Parameter Values")+
+  scale_color_discrete("",breaks=c("df=1","df=3","df=5","df=8","df=10"),
+                       labels=c(bquote(v==1),bquote(v==3),bquote(v==5),
+                                bquote(v==8),bquote(v==10)))
+
+grid.arrange(g1,g1.cdf,ncol=2)

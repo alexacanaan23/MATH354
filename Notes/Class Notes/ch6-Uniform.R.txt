@@ -1,0 +1,81 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### Uniform Distribution
+########################################################################
+dunif(x=0.20,min=0,max=1) #This the height of the PDF at x=0.20
+punif(q=0.20,min=0,max=1) #P(X<=0.20|a=0,b=1)
+qunif(p=0.90,min=0,max=1) #The 90th percentile
+runif(n=5,min=0,max=1) #A random sample of 5 Xi~Uniform(a=0,b=1)
+
+ggdat<-data.frame(x=seq(-1,6,0.001),
+                  f1=dunif(x=seq(-1,6,0.001),min=0,max=1),
+                  f2=dunif(x=seq(-1,6,0.001),min=0.25,max=3),
+                  f3=dunif(x=seq(-1,6,0.001),min=1.5,max=5),
+                  f4=dunif(x=seq(-1,6,0.001),min=2,max=4),
+                  f5=dunif(x=seq(-1,6,0.001),min=3.5,max=4.5))
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=f1,color="a=0 b=1"))+
+  geom_line(aes(y=f2,color="a=0.25 b=3"))+
+  geom_line(aes(y=f3,color="a=1.5 b=5"))+
+  geom_line(aes(y=f4,color="a=2 b=4"))+
+  geom_line(aes(y=f5,color="a=3.5 b=4.5"))+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Uniform PDF",subtitle="For Various Parameter Values")+
+  scale_color_discrete("",labels=c("a=0, b=1","a=0.25, b=3","a=1.5, b=5",
+                                   "a=2, b=4","a=3.5, b=4.5"))
+
+
+ggdat<-data.frame(x=seq(-1,6,0.001),
+                  F1=punif(q=seq(-1,6,0.001),min=0,max=1),
+                  F2=punif(q=seq(-1,6,0.001),min=0.25,max=3),
+                  F3=punif(q=seq(-1,6,0.001),min=1.5,max=5),
+                  F4=punif(q=seq(-1,6,0.001),min=2,max=4),
+                  F5=punif(q=seq(-1,6,0.001),min=3.5,max=4.5))
+g1.cdf<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=F1,color="a=0 b=1"))+
+  geom_line(aes(y=F2,color="a=0.25 b=3"))+
+  geom_line(aes(y=F3,color="a=1.5 b=5"))+
+  geom_line(aes(y=F4,color="a=2 b=4"))+
+  geom_line(aes(y=F5,color="a=3.5 b=4.5"))+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Uniform CDF",subtitle="For Various Parameter Values")+
+  scale_color_discrete("",labels=c("a=0, b=1","a=0.25, b=3","a=1.5,b=5",
+                                   "a=2, b=4","a=3.5, b=4.5"))
+
+grid.arrange(g1,g1.cdf,ncol=2)
+
+
+####Example
+punif(q=0.80,min=0,max=1,lower.tail = F)
+ggdat<-data.frame(x=seq(-0.5,1.5,0.001),
+                  f1=dunif(x=seq(-0.5,1.5,0.001),min=0,max=1))
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=f1))+
+  geom_ribbon(data=subset(ggdat,x>0.8 & x<=1),aes(ymax=f1),ymin=0,
+                    fill="red",colour=NA,alpha=0.5)+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("Pseudo Random Number (X)")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Uniform PDF",subtitle=bquote(P(X>0.80)~"for a=0, b=1"))
+
+ggdat<-data.frame(x=seq(-0.5,1.5,0.001),
+                  F1=punif(q=seq(-0.5,1.5,0.001),min=0,max=1))
+ggdat.highlight<-data.frame(x=0.80,
+                            y=punif(q=0.80,min=0,max=1))
+g1.cdf<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=F1))+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y),color="red")+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("Pseudo Random Number (X)")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Uniform CDF",subtitle=bquote(P(X<=0.80)~"for a=0, b=1"))
+grid.arrange(g1,g1.cdf,ncol=2)

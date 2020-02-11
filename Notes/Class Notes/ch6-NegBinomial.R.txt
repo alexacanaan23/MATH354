@@ -1,0 +1,143 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### negative binomial Distribution
+########################################################################
+dnbinom(x=1,prob=0.35,size=5) #P(X=1|n=5,p=0.35)
+pnbinom(q=1,prob=0.35,size=5) #P(X<=1|n=5,p=0.35)
+qnbinom(p=0.2,prob=0.35,size=5) #The 20th percentile
+rnbinom(n=10,prob=0.35,size=5) #A random sample of 10 Xi~nbinomial(n=5,p=0.35)
+
+ggdat<-data.frame(x=(-1:30),
+                  f1=dnbinom(x=(-1:30),size=5,prob=0.25),
+                  F1=pnbinom(q=(-1:30),size=5,prob=0.25),
+                  f2=dnbinom(x=(-1:30),size=5,prob=0.35),
+                  F2=pnbinom(q=(-1:30),size=5,prob=0.35),
+                  f3=dnbinom(x=(-1:30),size=5,prob=0.50),
+                  F3=pnbinom(q=(-1:30),size=5,prob=0.50),
+                  f4=dnbinom(x=(-1:30),size=5,prob=0.75),
+                  F4=pnbinom(q=(-1:30),size=5,prob=0.75))
+#####1
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f1), ymin=0)+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlim(0,30)+
+  ylim(0,0.30)+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Negative Binomial PMF",subtitle="n=5, p=0.25")
+
+ggdat.openpoints<-data.frame(x=ggdat$x,
+                             y=pnbinom(ggdat$x-1,size=5,prob=0.25))
+ggdat.closedpoints<-data.frame(x=ggdat$x,
+                               y=pnbinom(ggdat$x,size=5,prob=0.25))
+g1.CDF<-ggplot(data=ggdat, aes(x = x, y = F1)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Negative Binomial CDF",subtitle="n=5, p=0.25")
+
+#####2
+g2<-ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f2), ymin=0)+
+  geom_hline(yintercept=0)+
+  xlim(0,30)+
+  ylim(0,0.30)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Negative Binomial PMF",subtitle="n=5, p=0.35")
+
+ggdat.openpoints<-data.frame(x=ggdat$x,
+                             y=pnbinom(ggdat$x-1,size=5,prob=0.35))
+ggdat.closedpoints<-data.frame(x=ggdat$x,
+                               y=pnbinom(ggdat$x,size=5,prob=0.35))
+g2.CDF<-ggplot(data=ggdat, aes(x = x, y = F2)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Negative Binomial CDF",subtitle="n=5, p=0.35")
+
+#####3
+g3<-ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f3), ymin=0)+
+  geom_hline(yintercept=0)+
+  xlim(0,30)+
+  ylim(0,0.30)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Negative Binomial PMF",subtitle="n=5, p=0.50")
+
+ggdat.openpoints<-data.frame(x=ggdat$x,
+                             y=pnbinom(ggdat$x-1,size=5,prob=0.50))
+ggdat.closedpoints<-data.frame(x=ggdat$x,
+                               y=pnbinom(ggdat$x,size=5,prob=0.50))
+g3.CDF<-ggplot(data=ggdat, aes(x = x, y = F3)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Negative Binomial CDF",subtitle="n=5, p=0.50")
+
+#####4
+g4<-ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f4), ymin=0)+
+  geom_hline(yintercept=0)+
+  xlim(0,30)+
+  ylim(0,0.30)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Negative Binomial PMF",subtitle="n=5, p=0.75")
+
+ggdat.openpoints<-data.frame(x=ggdat$x,
+                             y=pnbinom(ggdat$x-1,size=5,prob=0.75))
+ggdat.closedpoints<-data.frame(x=ggdat$x,
+                               y=pnbinom(ggdat$x,size=5,prob=0.75))
+g4.CDF<-ggplot(data=ggdat, aes(x = x, y = F4)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Negative Binomial CDF",subtitle="n=5, p=0.75")
+
+grid.arrange(g1,g1.CDF,
+             g2,g2.CDF,
+             g3,g3.CDF,
+             g4,g4.CDF,ncol=2)
+
+####Example
+dnbinom(x=5,size=3,prob=0.59)
+
+ggdat<-data.frame(x=(0:10),
+                  f1=dnbinom(x=(0:10),size=3,prob=0.59))
+ggdat.highlight<-data.frame(x=2,
+                  y=dnbinom(x=2,size=3,prob=0.59))
+
+ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f1), ymin=0)+
+  geom_linerange(data=ggdat.highlight,aes(x=x,ymax=y), ymin=0,color="red")+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlim(0,10)+
+  ylim(0,0.30)+
+  xlab("Number of Failed Apicoectomies Until Third Success (X)")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Negative Binomial PMF",subtitle=bquote(P(X==2)~"for n=5, p=0.25"))
+

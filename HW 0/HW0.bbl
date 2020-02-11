@@ -1,0 +1,27 @@
+\begin{thebibliography}{}
+
+\bibitem[Bracht et~al., 2016]{Bracht16}
+Bracht, T., Molleken, C., Ahrens, M., Poschmann, G., Schlosser, A., Eisenacher,
+  M., Stuhler, K., Meyer, H.~E., Schmiegel, W.~H., Holmskov, U., Sorensen,
+  G.~L., and Sitek, B. (2016).
+\newblock Evaluation of the biomarker candidate mfap4 for non-invasive
+  assessment of hepatic fibrosis in hepatitis {C} patients.
+\newblock {\em Journal of Translational Medicine}, 14.
+
+\bibitem[Grolemund and Wickham, 2011]{lubridate}
+Grolemund, G. and Wickham, H. (2011).
+\newblock Dates and times made easy with {lubridate}.
+\newblock {\em Journal of Statistical Software}, 40(3):1--25.
+
+\bibitem[{Hadley Wickham}, 2019]{R}
+{Hadley Wickham} (2019).
+\newblock {\em stringr: Simple, Consistent Wrappers for Common String
+  Operations}.
+\newblock Version 1.4.0.
+
+\bibitem[Koenker, 2018]{quantreg}
+Koenker, R. (2018).
+\newblock {\em quantreg: Quantile Regression}.
+\newblock R package version 5.35.
+
+\end{thebibliography}

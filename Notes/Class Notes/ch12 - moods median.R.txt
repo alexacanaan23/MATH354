@@ -1,0 +1,235 @@
+library(ggplot2)
+library(gridExtra)
+########################################################################
+########################################################################
+#### Mood's Median
+########################################################################
+########################################################################
+########################################################################
+#### Mortar Example
+########################################################################
+dat.mortar<-data.frame(strength=c(51.45,42.96,41.11,48.06,38.27,38.88,42.74,49.62,
+                                  64.97,64.21,57.39,52.79,64.87,53.27,51.24,55.87,61.76,67.15,
+                                  48.95,62.41,52.11,60.45,58.07,52.16,61.71,61.06,57.63,56.80,
+                                  35.28,38.59,48.64,50.99,51.52,52.85,46.75,48.31),
+                       type=c(rep("OCM",8),rep("PIM",10),rep("RM",10),rep("PCM",8)))
+
+(overall.median <- median(dat.mortar$strength)) #overall median
+table(dat.mortar$type,dat.mortar$strength<overall.median)
+prop.table(table(dat.mortar$type,dat.mortar$strength<overall.median),margin = 1)
+
+library(RVAideMemoire)
+mood.medtest(strength~type,data=dat.mortar)
+
+#########################
+## Pairwise median comparisons
+#########################
+library(rcompanion)
+PT<-pairwiseMedianTest(strength~type,
+                       data   = dat.mortar,
+                       method = "BH")
+PT
+
+###############################
+## Benjamini hochberg -- by hand
+###############################
+p.values<-as.numeric(PT$p.value) #unadjusted p-values
+p.values<-p.values[order(p.values,decreasing=TRUE)]
+
+i<-6:1
+m<-rep(6,6)
+m/i*p.values
+BH<-cummin(m/i*p.values)
+
+###############################
+## Bonferroni -- by hand
+###############################
+p.values<-as.numeric(PT$p.value) #unadjusted p-values
+p.values<-p.values[order(p.values,decreasing=TRUE)]
+
+i<-6:1
+m<-rep(6,6)
+m/i*p.values
+BH<-cummin(m/i*p.values)
+
+Bonferroni<-pmin(1,m*p.values) #pmin takes the minimum between 1 and the adjusted p-value
+
+#########################
+## Compact Letter Display for grouping where no significant differences
+########################
+cldList(p.adjust ~ Comparison,
+        data = PT,
+        threshold = 0.05)
+
+
+#########################
+## Corrected Confidence Intervals -- Bonferroni
+########################
+alpha<-0.05
+m<-6
+(bonf.conf<-1-alpha/m)
+
+library("simpleboot")
+library("boot")
+boot.median<-function(data,indices){
+  d<-data[indices]# allows boot to select sample
+  return(median(d))
+}
+#########################
+## Row 1
+########################
+boot1<-two.boot(sample1=dat.mortar$strength[which(dat.mortar$type=="OCM")],
+                sample2=dat.mortar$strength[which(dat.mortar$type=="PCM")],
+                FUN=boot.median, R=1000)
+ci1<-boot.ci(boot.out=boot1,conf=bonf.conf,type="perc")
+estimate1<-median(dat.mortar$strength[which(dat.mortar$type=="OCM")])-
+  median(dat.mortar$strength[which(dat.mortar$type=="PCM")])
+#########################
+## Row 2
+########################
+boot2<-two.boot(sample1=dat.mortar$strength[which(dat.mortar$type=="OCM")],
+                sample2=dat.mortar$strength[which(dat.mortar$type=="PIM")],
+                FUN=boot.median, R=1000)
+ci2<-boot.ci(boot.out=boot2,conf=bonf.conf,type="perc")
+estimate2<-median(dat.mortar$strength[which(dat.mortar$type=="OCM")])-
+  median(dat.mortar$strength[which(dat.mortar$type=="PIM")])
+#########################
+## Row 3
+########################
+boot3<-two.boot(sample1=dat.mortar$strength[which(dat.mortar$type=="OCM")],
+                sample2=dat.mortar$strength[which(dat.mortar$type=="RM")],
+                FUN=boot.median, R=1000)
+ci3<-boot.ci(boot.out=boot3,conf=bonf.conf,type="perc")
+estimate3<-median(dat.mortar$strength[which(dat.mortar$type=="OCM")])-
+  median(dat.mortar$strength[which(dat.mortar$type=="RM")])
+#########################
+## Row 4
+########################
+boot4<-two.boot(sample1=dat.mortar$strength[which(dat.mortar$type=="PCM")],
+                sample2=dat.mortar$strength[which(dat.mortar$type=="PIM")],
+                FUN=boot.median, R=1000)
+ci4<-boot.ci(boot.out=boot4,conf=bonf.conf,type="perc")
+estimate4<-median(dat.mortar$strength[which(dat.mortar$type=="PCM")])-
+  median(dat.mortar$strength[which(dat.mortar$type=="PIM")])
+#########################
+## Row 5
+########################
+boot5<-two.boot(sample1=dat.mortar$strength[which(dat.mortar$type=="PCM")],
+                sample2=dat.mortar$strength[which(dat.mortar$type=="RM")],
+                FUN=boot.median, R=1000)
+ci5<-boot.ci(boot.out=boot5,conf=bonf.conf,type="perc")
+estimate5<-median(dat.mortar$strength[which(dat.mortar$type=="PCM")])-
+  median(dat.mortar$strength[which(dat.mortar$type=="RM")])
+#########################
+## Row 6
+########################
+boot6<-two.boot(sample1=dat.mortar$strength[which(dat.mortar$type=="PIM")],
+                sample2=dat.mortar$strength[which(dat.mortar$type=="RM")],
+                FUN=boot.median, R=1000)
+ci6<-boot.ci(boot.out=boot6,conf=bonf.conf,type="perc")
+estimate6<-median(dat.mortar$strength[which(dat.mortar$type=="PIM")])-
+  median(dat.mortar$strength[which(dat.mortar$type=="RM")])
+
+B.conf.intervals<- data.frame(Comparison=c("OCM-PCM","OCM-PIM","OCM-RM",
+                                           "PCM-PIM","PCM-RM" ,"PIM-RM"),
+                              Estimate=c(estimate1,estimate2,estimate3,
+                                         estimate4,estimate5,estimate6),
+                              lower=c(ci1$percent[4],ci2$percent[4],ci3$percent[4],
+                                      ci4$percent[4],ci5$percent[4],ci6$percent[4]),
+                              upper=c(ci1$percent[5],ci2$percent[5],ci3$percent[5],
+                                      ci4$percent[5],ci5$percent[5],ci6$percent[5]))
+
+#########################
+## Corrected Confidence Intervals -- Benjamini-Hochberg
+########################
+#https://www.jstor.org/stable/pdf/27590520.pdf?casa_token=WIbh1whG3MsAAAAA:mg1QHJ1MhwqigeV8aprbuzSlFOd2qez2U-b68P-V2t3EbsCq7dZHAqzr0cuKJt6o4dX984BTNinBeQssWvaEaFXhlGF4IRgMGztCu_yBrANKUgEXIJM
+alpha<-0.05
+m<-6
+length(which(PT$p.value<0.05))
+(bh.conf<-1-4*(alpha/m))  #4 significant results according to adjusted p-values
+
+library("simpleboot")
+library("boot")
+boot.median<-function(data,indices){
+  d<-data[indices]# allows boot to select sample
+  return(median(d))
+}
+#########################
+## Row 1
+########################
+# boot1<-two.boot(sample1=dat.mortar$strength[which(dat.mortar$type=="OCM")],
+#                 sample2=dat.mortar$strength[which(dat.mortar$type=="PCM")],
+#                 FUN=boot.median, R=1000)
+# ci1<-boot.ci(boot.out=boot1,conf=bh.conf,type="perc")
+# estimate1<-median(dat.mortar$strength[which(dat.mortar$type=="OCM")])-
+#            median(dat.mortar$strength[which(dat.mortar$type=="PCM")])
+
+#########################
+## Row 2
+########################
+boot2<-two.boot(sample1=dat.mortar$strength[which(dat.mortar$type=="OCM")],
+                sample2=dat.mortar$strength[which(dat.mortar$type=="PIM")],
+                FUN=boot.median, R=1000)
+ci2<-boot.ci(boot.out=boot2,conf=bh.conf,type="perc")
+estimate2<-median(dat.mortar$strength[which(dat.mortar$type=="OCM")])-
+  median(dat.mortar$strength[which(dat.mortar$type=="PIM")])
+#########################
+## Row 3
+########################
+boot3<-two.boot(sample1=dat.mortar$strength[which(dat.mortar$type=="OCM")],
+                sample2=dat.mortar$strength[which(dat.mortar$type=="RM")],
+                FUN=boot.median, R=1000)
+ci3<-boot.ci(boot.out=boot3,conf=bh.conf,type="perc")
+estimate3<-median(dat.mortar$strength[which(dat.mortar$type=="OCM")])-
+  median(dat.mortar$strength[which(dat.mortar$type=="RM")])
+
+#########################
+## Row 4
+########################
+boot4<-two.boot(sample1=dat.mortar$strength[which(dat.mortar$type=="PCM")],
+                sample2=dat.mortar$strength[which(dat.mortar$type=="PIM")],
+                FUN=boot.median, R=1000)
+ci4<-boot.ci(boot.out=boot4,conf=bh.conf,type="perc")
+estimate4<-median(dat.mortar$strength[which(dat.mortar$type=="PCM")])-
+  median(dat.mortar$strength[which(dat.mortar$type=="PIM")])
+#########################
+## Row 5
+########################
+boot5<-two.boot(sample1=dat.mortar$strength[which(dat.mortar$type=="PCM")],
+                sample2=dat.mortar$strength[which(dat.mortar$type=="RM")],
+                FUN=boot.median, R=1000)
+ci5<-boot.ci(boot.out=boot5,conf=bh.conf,type="perc")
+estimate5<-median(dat.mortar$strength[which(dat.mortar$type=="PCM")])-
+  median(dat.mortar$strength[which(dat.mortar$type=="RM")])
+
+#########################
+## Row 6
+########################
+# boot6<-two.boot(sample1=dat.mortar$strength[which(dat.mortar$type=="PIM")],
+#                 sample2=dat.mortar$strength[which(dat.mortar$type=="RM")],
+#                 FUN=boot.median, R=1000)
+# ci6<-boot.ci(boot.out=boot6,conf=bh.conf,type="perc")
+#estimate6<-median(dat.mortar$strength[which(dat.mortar$type=="PIM")])-
+#  median(dat.mortar$strength[which(dat.mortar$type=="RM")])
+
+
+BH.conf.intervals<- data.frame(Comparison=c("OCM-PCM","OCM-PIM","OCM-RM",
+                                            "PCM-PIM","PCM-RM" ,"PIM-RM"),
+                               Estimate=c(estimate1,estimate2,estimate3,
+                                          estimate4,estimate5,estimate6),
+                               lower=c(NA          ,ci2$percent[4],ci3$percent[4],
+                                       ci4$percent[4],ci5$percent[4],NA          ),
+                               upper=c(NA          ,ci2$percent[5],ci3$percent[5],
+                                       ci4$percent[5],ci5$percent[5],NA          ))
+
+#Combine Results
+conf.intervals<-rbind(B.conf.intervals,BH.conf.intervals)
+conf.intervals<-cbind(conf.intervals,Type=c(rep("Bonferonni",6),rep("BH",6)))
+ggdat<-data.frame(conf.intervals)
+ggplot(data=ggdat,aes(x=Comparison,y=Estimate,color=Type))+
+  geom_pointrange(aes(ymin = lower, ymax = upper),position=position_dodge(0.25))+
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2,position=position_dodge(0.25))+
+  geom_hline(yintercept = 0, linetype="dashed")+
+  theme_bw()+
+  xlab("Pairwise Difference")+
+  ylab("Estimated Difference in Strength (MPa)")

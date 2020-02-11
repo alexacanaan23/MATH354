@@ -1,0 +1,59 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### F Distribution
+########################################################################
+df(x=0.50,df1=10,df2=5) #This the height of the PDF at x=0.50
+pf(q=0.250,df1=10,df2=5) #P(X<=0.0.250|u=10,v=5)
+qf(p=0.90,df1=10,df2=5) #The 90th percentile
+rf(n=5,df1=10,df2=5) #A random sample of 5 Xi~F(u=10,v=5)
+
+ggdat<-data.frame(x=seq(0,5,0.001),
+                  f1=df(x=seq(0,5,0.001),df1=1,df2=1),
+                  f2=df(x=seq(0,5,0.001),df1=5,df2=1),
+                  f3=df(x=seq(0,5,0.001),df1=1,df2=5),
+                  f4=df(x=seq(0,5,0.001),df1=5,df2=10),
+                  f5=df(x=seq(0,5,0.001),df1=10,df2=10))
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=f1,color="df1=1 df2=1"))+
+  geom_line(aes(y=f2,color="df1=5 df2=1"))+
+  geom_line(aes(y=f3,color="df1=1 df2=5"))+
+  geom_line(aes(y=f4,color="df1=5 df2=10"))+
+  geom_line(aes(y=f5,color="df1=10 df2=10"))+
+  geom_hline(yintercept=0)+
+  ylim(0,1)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("F PDF",subtitle="For Various Parameter Values")+
+  scale_color_discrete("",breaks=c("df1=1 df2=1","df1=5 df2=1","df1=1 df2=5",
+                                   "df1=5 df2=10","df1=10 df2=10"),
+                       labels=c(bquote(v[1]==1~","~v[2]==1),bquote(v[1]==5~","~v[2]==1),
+                                bquote(v[1]==1~","~v[2]==5),bquote(v[1]==5~","~v[2]==10),
+                                bquote(v[1]==10~","~v[2]==10)))
+
+ggdat<-data.frame(x=seq(0,5,0.001),
+                  F1=pf(q=seq(0,5,0.001),df1=1,df2=1),
+                  F2=pf(q=seq(0,5,0.001),df1=5,df2=1),
+                  F3=pf(q=seq(0,5,0.001),df1=1,df2=5),
+                  F4=pf(q=seq(0,5,0.001),df1=5,df2=10),
+                  F5=pf(q=seq(0,5,0.001),df1=10,df2=10))
+g1.cdf<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=F1,color="df1=1 df2=1"))+
+  geom_line(aes(y=F2,color="df1=5 df2=1"))+
+  geom_line(aes(y=F3,color="df1=1 df2=5"))+
+  geom_line(aes(y=F4,color="df1=5 df2=10"))+
+  geom_line(aes(y=F5,color="df1=10 df2=10"))+
+  geom_hline(yintercept=0)+
+  ylim(0,1)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("F CDF",subtitle="For Various Parameter Values")+
+  scale_color_discrete("",breaks=c("df1=1 df2=1","df1=5 df2=1","df1=1 df2=5",
+                                   "df1=5 df2=10","df1=10 df2=10"),
+                       labels=c(bquote(v[1]==1~","~v[2]==1),bquote(v[1]==5~","~v[2]==1),
+                                bquote(v[1]==1~","~v[2]==5),bquote(v[1]==5~","~v[2]==10),
+                                bquote(v[1]==10~","~v[2]==10)))
+
+grid.arrange(g1,g1.cdf,ncol=2)

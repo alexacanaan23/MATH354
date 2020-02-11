@@ -1,0 +1,177 @@
+library(ggplot2)
+library(gridExtra)
+########################################################################
+########################################################################
+#### Fisher's Test
+########################################################################
+########################################################################
+filt.rate<-c(125.3,98.2,201.4,147.3,145.9,124.7,112.2,120.2,161.2,178.9,
+             159.5,145.8,75.1,151.4,144.2,125,198.8,132.5,159.6,110.7)
+moisture<-c(77.9,76.8,81.5,79.8,78.2,78.3,77.5,77,80.1,80.2,
+            79.9,79,76.7,78.2,79.5,78.1,81.5,77,79,78.6)
+#######################
+##Plot Linear Relationship
+#######################
+ggdat<-data.frame(filt.rate=filt.rate,moisture=moisture)
+ggplot(ggdat, aes(x=filt.rate, y=moisture)) +
+  geom_point(shape=1)+
+  geom_smooth(alpha=0.25,color="black",method="lm")+
+  theme_bw()+
+  xlab("Filtration rate (km/m/hr)")+
+  ylab("Pellet Moisture (%)")
+
+#######################
+##Fit Model
+#######################
+sewage.mod<-lm(moisture~filt.rate)
+summary(sewage.mod)
+
+#######################
+##Table
+#######################
+tab<-cbind(filt.rate,moisture,y.hat=sewage.mod$fitted.values,e=sewage.mod$residuals)
+round(tab,3)
+
+#######################
+##Errors sum to 0
+#######################
+sum(sewage.mod$residuals)
+
+#######################
+##Are errors Gaussian?
+#######################
+ggdat<-data.frame(residuals=sewage.mod$residuals)
+g1<-ggplot(data=ggdat,aes(x=residuals))+
+  geom_histogram(aes(y=..density..),
+                 fill="lightblue",color="black",bins=8)+
+  geom_hline(yintercept=0)+
+  geom_density(fill="red", alpha = 0.2)+
+  theme_bw()+
+  xlab("Residuals")+
+  ylab("Density")
+
+library("qqplotr")
+g2<-ggplot(data=ggdat,aes(sample=residuals))+
+  stat_qq_band(alpha=0.25) +
+  stat_qq_line() +
+  stat_qq_point() +
+  theme_bw()+
+  xlab("Gaussian Quantiles")+
+  ylab("Sample Quantiles")
+
+grid.arrange(g1,g2,ncol=2)
+#######################
+##Do the errors have common variance
+#######################
+ggdat<-data.frame(residuals=sewage.mod$residuals,
+                  fitted=sewage.mod$fitted.values)
+ggplot(data=ggdat,aes(x=fitted,y=residuals))+
+  geom_point(shape=1)+
+  geom_hline(yintercept=0,linetype="dashed")+
+  theme_bw()+
+  xlab(bquote(hat(Y)))+
+  ylab("Residuals")
+
+#######################
+##MSE calculation
+#######################
+(MS.res<-sum(sewage.mod$residuals^2)/(length(moisture)-2))
+(sigma.hat<-sqrt(MS.res))
+
+#######################
+##Confidence interval for beta
+#######################
+confint(sewage.mod,level=0.95)
+
+#######################
+##Confidence interval for beta
+#######################
+summary(sewage.mod)
+
+#################################
+# Visualization
+#################################
+b1<-sewage.mod$coefficients[2]
+se.b1<-summary(sewage.mod)$coefficients[2,2]
+t.obs<-b1/se.b1
+n<-length(moisture)
+alpha<-0.05
+
+ggdat<-data.frame(t=seq(-4.5,4.5,0.01),
+                  f=dt(x=seq(-4.5,4.5,0.01),df=n-2))
+ggdat.highlight<-data.frame(x=c(-t.obs,t.obs),y=c(0,0))
+
+axis.labels<-round(c(-abs(b1),qt(0.05,df=n-2)*se.b1,
+                              0,
+                              qt(0.95,df=n-2)*se.b1,
+                     abs(b1)),3)
+
+ggplot(data=ggdat,aes(x=t,y=f))+
+  geom_line()+
+  geom_ribbon(data=subset(ggdat,t>=qt(1-alpha/2,df=n-2)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA)+
+  geom_ribbon(data=subset(ggdat,t<=qt(alpha/2,df=n-2)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA)+
+  geom_ribbon(data=subset(ggdat,t>=abs(t.obs)),aes(ymax=f),ymin=0,
+              fill="red",color=NA,alpha=0.25)+
+  geom_ribbon(data=subset(ggdat,t<=-abs(t.obs)),aes(ymax=f),ymin=0,
+              fill="red",color=NA,alpha=0.25)+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y),color="red")+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab("t")+
+  ylab("Density")+
+  ggtitle("T Test for the Filtration Rate Coefficient",
+          subtitle=bquote(H[0]*":"~beta[1]==0*{", versus "*H[a]*":"~beta[1]!=0}))+
+  annotate("text", x=4, y=0.05,
+           label= deparse(bquote(alpha==0.05)),parse=T,size=3.5)+ 
+  annotate("text", x=8, y=0.05, label="Observation\nP-value<0.0001",size=3.5)+
+  annotate("text", x=-8, y=0.05, label="Mirrored\nObservation",size=3.5)+
+  scale_x_continuous(sec.axis = sec_axis(~., 
+                                         breaks=c(-abs(t.obs),qt(alpha,n-1),0,qt(1-alpha,n-1),abs(t.obs)),
+                                         labels = axis.labels,name="Coefficient Estimate"))
+
+#################################
+# Prediction + confidence intervals
+#################################
+newData<-data.frame(filt.rate=c(150,140))
+predict(sewage.mod,newdata=newData,level=0.95,interval="confidence")
+predict(sewage.mod,newdata=newData,level=0.95,interval="prediction")
+
+#################################
+# Visualization
+#################################
+ggdat<-data.frame(filt.rate=filt.rate,
+                  moisture=moisture)
+
+newdata<-data.frame(filt.rate=seq(75,202,0.01))
+pred<-predict(sewage.mod,newdata=newdata,level=0.95,interval="prediction")
+conf<-predict(sewage.mod,newdata=newdata,level=0.95,interval="confidence")
+
+ggdat.intervals<-data.frame(x=newdata,
+                            pred.lower=pred[,2],
+                            pred.upper=pred[,3],
+                            conf.lower=conf[,2],
+                            conf.upper=conf[,3])
+
+g1<-ggplot(data=ggdat.intervals, aes(x=x))+
+  geom_ribbon(aes(ymin = conf.lower, ymax = conf.upper), fill = "grey", alpha = 0.5)+
+  geom_point(data=ggdat,aes(x=filt.rate,y=moisture),shape=1)+
+  geom_smooth(data=ggdat,aes(x=filt.rate,y=moisture),color="black",method="lm",se=FALSE)+
+  theme_bw()+
+  ggtitle("95% Confidence Interval",
+          subtitle=bquote("For inference about"~E(YlX==x[0])))+
+  xlab("Filtration rate (km/m/hr)")+
+  ylab("Pellet Moisture (%)")
+
+g2<-ggplot(data=ggdat.intervals, aes(x=x))+
+  geom_ribbon(aes(ymin = pred.lower, ymax = pred.upper), fill = "grey", alpha = 0.5)+
+  geom_point(data=ggdat,aes(x=filt.rate,y=moisture),shape=1)+
+  geom_smooth(data=ggdat,aes(x=filt.rate,y=moisture),color="black",method="lm",se=FALSE)+
+  theme_bw()+
+  ggtitle("95% Prediction Interval",
+          subtitle=bquote("For inference about"~Y^"*"*(X==x[0])))+
+  xlab("Filtration rate (km/m/hr)")+
+  ylab("Pellet Moisture (%)")
+
+grid.arrange(g1,g2)

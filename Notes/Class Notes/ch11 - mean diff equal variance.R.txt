@@ -1,0 +1,91 @@
+library("ggplot2")
+library("gridExtra")
+
+########################################################################
+#### Example fish weights
+########################################################################
+
+#########################
+#### Load Data
+#########################
+ggdat<-data.frame(weights=c(21.9,18.5,12.3,16.7,21.0,15.1,18.2,23.0,36.8,26.6,
+                            21.0,19.6,14.4,16.9,23.4,14.6,10.4,16.5),
+                  locations=c(rep("Location 1",10),rep("Location 2",8)))
+
+#########################
+#### Plot to check variances
+#########################
+ggplot(data=ggdat,aes(x=locations, y=weights))+
+  geom_violin(fill="lightblue")+
+  geom_boxplot(width=0.25)+
+  theme_bw()+
+  xlab("Sampling Location")+
+  ylab("Weight in Ounces")
+
+#########################
+#### ``By Hand Calculation
+#########################
+alpha<-0.10
+(n.1<-length(which(ggdat$locations=="Location 1")))
+(n.2<-length(which(ggdat$locations=="Location 2")))
+
+(xbar.1<-mean(ggdat$weights[which(ggdat$locations=="Location 1")]))
+(xbar.2<-mean(ggdat$weights[which(ggdat$locations=="Location 2")]))
+
+(sd.1<-sd(ggdat$weights[which(ggdat$locations=="Location 1")]))
+(sd.2<-sd(ggdat$weights[which(ggdat$locations=="Location 2")]))
+
+(sd.p<- sqrt(((n.1-1)*sd.1^2 + (n.2-1)*sd.2^2)/(n.1+n.2-2)))
+
+(xbar.1-xbar.2) + c(-1,1)*qt(1-alpha/2,df=n.1+n.2-2)*sqrt(sd.p^2*(1/n.1+1/n.2))
+
+#########################
+#### Having R do it
+#########################
+t.test(ggdat$weights[which(ggdat$locations=="Location 1")],
+       ggdat$weights[which(ggdat$locations=="Location 2")],
+       conf.level=0.90,var.equal=TRUE)
+
+#########################
+#### Check For Normality
+#########################
+library("qqplotr")
+ggplot(data=ggdat,aes(sample=weights))+
+  stat_qq_band(alpha=0.25) +
+  stat_qq_line() +
+  stat_qq_point() +
+  theme_bw()+
+  xlab("Gaussian Quantiles")+
+  ylab("Sample Quantiles")+
+  facet_grid(. ~ locations)
+
+#########################
+#### Plot Confidence Interval
+#########################
+alpha<-0.10 #significance level
+test<-t.test(ggdat$weights[which(ggdat$locations=="Location 1")],
+             ggdat$weights[which(ggdat$locations=="Location 2")],
+             conf.level=0.90,var.equal=TRUE)
+
+ggdat<-data.frame(t=seq(from=-4,to=4,by=0.01),
+                  f=dt(seq(from=-4,to=4,by=0.01),df=test$parameter))
+ggdat.highlight<-data.frame(x=qt(p = c(alpha/2,1-alpha/2),df=test$parameter),
+                            y=c(0,0))
+axis.labels<-round(c(qt(alpha/2,test$parameter),0,qt(1-alpha/2,test$parameter))*
+                     test$stderr + (-diff(test$estimate)),3)
+ggplot(data=ggdat,aes(x=t,y=f))+
+  geom_line()+
+  geom_ribbon(data=subset(ggdat,t<=qt(alpha/2,df=test$parameter)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+ 
+  geom_ribbon(data=subset(ggdat,t>=qt(1-alpha/2,df=test$parameter)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y))+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab("t")+
+  ylab("Density")+
+  annotate("text", x=-3.1, y=0.05, label= deparse(bquote(alpha/2==0.05)),parse=T,size=3.5)+ 
+  annotate("text", x=3.1, y=0.05, label= deparse(bquote(alpha/2==0.05)),parse=T,size=3.5)+
+  annotate("text", x=0, y=0.2, label= deparse(bquote(1-alpha==0.90)),parse=T,size=3.5)+
+  scale_x_continuous(sec.axis = sec_axis(~., breaks=c(qt(alpha/2,test$parameter),0,qt(1-alpha/2,test$parameter)),
+                                         labels = axis.labels,name="Difference of Weight in Ounces"))  

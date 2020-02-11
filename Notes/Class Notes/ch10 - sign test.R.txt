@@ -1,0 +1,66 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### Copper Example
+########################################################################
+#########################
+## Key Values
+#########################
+library("MASS")
+data(chem)
+copper_amnt<-chem
+
+ggdat<-data.frame(copper_amnt=copper_amnt)
+
+ggplot(data=ggdat,aes(x=copper_amnt))+
+  geom_histogram(aes(y=..density..),
+                 bins=20,color="black",fill="lightblue")+
+  geom_hline(yintercept = 0)+
+  theme_bw()+  
+  xlab(bquote("Amount of Copper ("*mu*g/g*")"))+
+  ylab("Density")+
+  ggtitle("Copper in Wholemeal Flour")
+
+n<-length(copper_amnt)
+m0<-4
+m.hat<-median(copper_amnt)
+alpha<-0.05
+
+#########################
+## sign-test
+#########################
+(B.obs<-length(which(copper_amnt>m0))) ##test statistic
+(p.value<-1-pbinom(q=(2-1),size=n,prob=0.50)) ##p value
+
+Expected.Observation<-n*0.50  #if 4 were the median we'd expect
+#the test statistic to be (n/2)=12
+
+#Functionality in R:
+#install.packages("BSDA")
+library("BSDA")
+SIGN.test(x=copper_amnt,md=4,alternative="greater",conf.level=0.95)
+
+#########################
+## Visualization
+#########################
+ggdat<-data.frame(x=(0:24), 
+                  f=dbinom(x=(0:24),size=n,prob=0.50))
+ggdat.highlight.pvalue<-data.frame(x=2:24,f=dbinom(x=2:24,size=n,prob=0.50))
+ggdat.highlight.observation<-data.frame(x=2,y=0)
+
+ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f), ymin=0)+
+  geom_linerange(data=ggdat.highlight.pvalue,aes(x=x,ymax=f),color="red", ymin=0)+
+  geom_point(data=ggdat.highlight.observation,aes(x=x,y=y),color="red")+
+  geom_ribbon(data=subset(ggdat,x>=qbinom(1-alpha,size=n,prob=0.50)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("Observations Larger than the Median")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Sign Test for the Population Median PMF",
+          subtitle=bquote(H[0]*":"~M==4*{", versus "*H[a]*":"~M>4}))+
+  annotate("text", x=19, y=0.025,
+           label= deparse(bquote(alpha==0.05)),parse=T,size=3.5)+ 
+  annotate("text", x=B.obs, y=0.025, label="Observation",size=3.5)+
+  annotate("text", x=17, y=0.125, label="P-value=0.9999",size=3.5)

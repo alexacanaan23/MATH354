@@ -1,0 +1,287 @@
+########################################################################
+########################################################################
+## How to graph discrete CDFs in R
+########################################################################
+########################################################################
+plotCDF<-function(x,Fx,main="",xlab="",ylab=""){
+  CDF<-c() #a place to save the values of the cdf
+  for(i in 1:length(x)){#for each x value there will be a jump in the cdf
+    val<-ifelse(i==1,0,Fx[i-1]) #previous value of cdf (pre jump)
+    CDF<-c(CDF,c(val,Fx[i]))    #new value of cdf (post jump)
+  }#end loop
+  ##repeat the x values (we need to plot two points at each jump)
+  x<-rep(x,2)
+  x<-x[order(x)] #put back in ascending order
+  #plot CDF
+  plot(x,CDF,type="l", main=main,xlab=xlab,ylab=ylab)
+  points(x[seq(1,length(CDF),2)],CDF[seq(1,length(CDF),2)])#open points
+  points(x[seq(2,length(CDF),2)],CDF[seq(2,length(CDF),2)],pch=16) #closed points
+  abline(h=0)
+}
+
+########################################################################
+########################################################################
+## Bernoulli Distribution
+########################################################################
+########################################################################
+## R doesn't have the Bernoulli distribution
+## built in.
+dbern<-function(x,p){
+  indicator<-rep(0,length(x))
+  indicator[x==0]<-1 #indicator should be one if x=0
+  indicator[x==1]<-1 #indicator should be one if x=1
+  fx<-(p^x*(1-p)^(1-x))*indicator
+  return(fx)
+}
+pbern<-function(q,p){
+  indicator1<-rep(1,length(q))
+  indicator1[q!=0]<-0 #indicator should be zero if x!=0
+  indicator2<-rep(1,length(q))
+  indicator2[q<1]<-0 #indicator should be zero if x<1
+  Fx<-(1-p)*indicator1 + indicator2
+  return(Fx)
+}
+qbern<-function(u,p){
+  if(p<0 | p>1){
+    errormsg<-"This function is only valid for probabilities between 0 and 1."
+    stop(errormsg)
+  }
+  q<-rep(1,length(p))
+  q[u<=1-p]<-0
+  q[u>1-p]<-1
+  return(q)
+}
+dbern(x=0,p=0.25) #P(X=0|p=0.25)
+pbern(q=0,p=0.25) #P(X<=0|p=0.25)
+qbern(u=0.7,p=0.25)
+
+rbern<-function(n,p){
+  support<-c(0,1)
+  x<-sample(x=support,size=n,replace=T,prob=dbern(support,p=p))
+  return(x)
+}
+rbern(n=10,p=0.25) #A random sample of 10 Xi~Bernoulli(p=0.25)
+
+
+
+par(mfrow=c(1,2))
+#####Plots
+#PMF
+x<-seq(from=-1,to=2,by=1)
+fx<-dbern(x=x,p=0.25)
+#type="h" yields a bar plot
+plot(x,fx,type="h",xlab="X",ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+#CDF
+x<-seq(from=-1,to=2,by=1)
+Fx<-pbern(q=x,p=0.25)
+plotCDF(x,Fx,xlab="X",ylab=bquote(F[x](x)))
+
+
+########################################################################
+########################################################################
+## Binomial Distribution
+########################################################################
+########################################################################
+dbinom(x=1,prob=0.25,size=10) #P(X=1|n=10,p=0.25)
+pbinom(q=1,prob=0.25,size=10) #P(X<=1|n=10,p=0.25)
+qbinom(p=0.2,prob=0.25,size=10) #The 20th percentile
+rbinom(n=10,prob=0.25,size=10) #A random sample of 10 Xi~Binomial(n=10,p=0.25)
+
+
+par(mfrow=c(1,2))
+#####Plots
+#PMF
+x<-seq(from=-1,to=11,by=1)
+fx<-dbinom(x=x,prob=0.25,size=10)
+#type="h" yields a bar plot
+plot(x,fx,type="h",xlab="X",ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+#CDF
+x<-seq(from=-1,to=11,by=1)
+Fx<-pbinom(q=x,prob=0.25,size=10)
+plotCDF(x,Fx,xlab="X",ylab=bquote(F[x](x)))
+
+#####Example Q1
+dbinom(x=1,size=100,prob=0.05)#P(X=1|n=100,p=0.05)
+
+x<-seq(0,15,1)
+fx<-dbinom(x,size=100,prob=0.05)
+plot(x,fx,type="h",xlab="Defective Items (X)",ylab=bquote(f[x](x)))
+abline(h=0)#adds the x-axis
+lines(1,dbinom(x=1,size=100,prob=0.05),type="h",col="red",lwd=2)
+
+#####Example Q2
+pbinom(q=5,size=100,prob=0.05)#P(X<=5|n=100,p=0.05)
+
+par(mfrow=c(1,2))
+#PMF
+x<-seq(0,15,1)
+fx<-dbinom(x,size=100,prob=0.05)
+plot(x,f,type="h",xlab="Defective Items (X)",ylab=bquote(f[x](x)))
+abline(h=0)#adds the x-axis
+x_vals<-seq(0,5,1)
+lines(x_vals,dbinom(x=x_vals,size=100,prob=0.05),type="h",col="red",lwd=2)
+#CDF
+x<-seq(0,15,1)
+Fx<-pbinom(x,size=100,prob=0.05)
+plotCDF(x,Fx,xlab="Defective Items (X)",ylab=bquote(F[x](x)))
+points(5,pbinom(5,size=100,prob=0.05),pch=16,col="red")
+
+#####Example Q3
+qbinom(p=0.10,size=100,prob=0.05)#The 10th percentile
+pbinom(q=1,size=100,prob=0.05)#P(X<=1|n=100,p=0.05)
+pbinom(q=2,size=100,prob=0.05)#P(X<=2|n=100,p=0.05)
+pbinom(q=3,size=100,prob=0.05)#P(X<=3|n=100,p=0.05)
+
+x<-seq(0,15,1)
+Fx<-pbinom(x,size=100,prob=0.05)
+plotCDF(x,Fx,xlab="Defective Items (X)",ylab=bquote(F[x](x)))
+abline(h=0)
+abline(h=0.10,col="red")
+
+########################################################################
+########################################################################
+## Hypergeometric Distribution
+########################################################################
+########################################################################
+dhyper(x=1,m=10,n=90,k=5) #P(X=1|m=10,n=90,k=5)
+phyper(q=1,m=10,n=90,k=5) #P(X<=1|m=10,n=90,k=5)
+qhyper(p=0.9,m=10,n=90,k=5) #The 90th percentile
+rhyper(nn=10,m=10,n=90,k=5) #A random sample of 10 Xi~Binomial(n=10,p=0.25)
+
+
+par(mfrow=c(1,2))
+#####Plots
+#PMF
+x<-seq(from=-1,to=6,by=1)
+fx<-dhyper(x=x,m=10,n=90,k=5)
+#type="h" yields a bar plot
+plot(x,fx,type="h",xlab="X",ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+#CDF
+x<-seq(from=-1,to=6,by=1)
+Fx<-phyper(q=x,m=10,n=90,k=5)
+plotCDF(x,Fx,xlab="X",ylab=bquote(F[x](x)))
+
+#####Example Q1
+1-dhyper(x=0,m=10,n=90,k=5) #1-P(X=0|m=10,n=90,k=5)
+
+par(mfrow=c(1,2))
+#PMF
+x<-seq(from=-1,to=6,by=1)
+fx<-dhyper(x=x,m=10,n=90,k=5)
+#type="h" yields a bar plot
+plot(x,fx,type="h",xlab="Defective Items (X)",ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+xvals<-seq(from=1,to=5,by=1)
+lines(xvals,dhyper(x=xvals,m=10,n=90,k=5),type="h",col="red",lwd=2)
+#CDF
+x<-seq(from=-1,to=5,by=1)
+Fx<-phyper(q=x,m=10,n=90,k=5)
+plotCDF(x,Fx,xlab="Defective Items (X)",ylab=bquote(F[x](x)))
+points(0,phyper(q=0,m=10,n=90,k=5),pch=16,col="red")
+
+#####Example Q2
+1-phyper(q=2,m=10,n=90,k=5) #1-P(X<=2|m=10,n=90,k=5)
+
+par(mfrow=c(1,2))
+#PMF
+x<-seq(from=-1,to=6,by=1)
+fx<-dhyper(x=x,m=10,n=90,k=5)
+#type="h" yields a bar plot
+plot(x,fx,type="h",xlab="Defective Items (X)",ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+xvals<-seq(from=3,to=5,by=1)
+lines(xvals,dhyper(x=xvals,m=10,n=90,k=5),type="h",col="red",lwd=2)
+#CDF
+x<-seq(from=-1,to=6,by=1)
+Fx<-phyper(q=x,m=10,n=90,k=5)
+plotCDF(x,Fx,xlab="Defective Items (X)",ylab=bquote(F[x](x)))
+points(2,phyper(q=2,m=10,n=90,k=5),pch=16,col="red")
+
+
+########################################################################
+########################################################################
+## Negative Binomial Distribution 
+########################################################################
+########################################################################
+dnbinom(x=2,size = 5, prob=.35) #P(X=2|p=0.35)
+pnbinom(q=2,size = 5,prob=.35) #P(X<=2|p=0.35)
+qnbinom(p=0.70,size = 5,prob=.35) #The 70th percentile
+rnbinom(n=10,size = 5,prob=.35) #A random sample of 10 Xi~Geometric(p=0.35)
+
+
+par(mfrow=c(1,2))
+#####Plots
+#PMF
+x<-seq(from=-1,to=30,by=1)
+fx<-dnbinom(x=x,size = 5,prob=.35)
+#type="h" yields a bar plot
+plot(x,fx,type="h",xlab="X",ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+#CDF
+x<-seq(from=-1,to=30,by=1)
+Fx<-pnbinom(q=x,size = 5,prob=.35)
+plotCDF(x,Fx,xlab="X",ylab=bquote(F[x](x)))
+
+
+#####Example Q1
+dnbinom(x=2,size=3,prob=0.59)
+#PMF
+x<-seq(from=-1,to=10,by=1)
+fx<-dnbinom(x=x,size=3,prob=.59)
+#type="h" yields a bar plot
+plot(x,fx,type="h",xlab="Failed Apicoectomies Until Third Successful Apicoectomy (X)",
+     ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+lines(x=2,y=dnbinom(x=2,size=3,prob=0.59),lwd=2,col="red",type="h")
+
+
+########################################################################
+########################################################################
+## Poisson Distribution 
+########################################################################
+########################################################################
+dpois(x=2,lambda=1) #P(X=2|lambda=1)
+ppois(q=2,lambda=1) #P(X<=2|lambda=1)
+qpois(p=0.90,lambda=1) #The 90th percentile
+rpois(n=10,lambda=1) #A random sample of 10 Xi~Poisson(lambda=1)
+
+
+par(mfrow=c(1,2))
+#####Plots
+#PMF
+x<-seq(from=-1,to=6,by=1)
+fx<-dpois(x=x,lambda=1)
+#type="h" yields a bar plot
+plot(x,fx,type="h",xlab="X",ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+#CDF
+x<-seq(from=-1,to=6,by=1)
+Fx<-ppois(q=x,lambda=1)
+plotCDF(x,Fx,xlab="X",ylab=bquote(F[x](x)))
+
+#####Example Q1
+dpois(x=2,lambda=5.295) #P(X=2|lambda=5.295)
+x<-seq(from=-1,to=15,by=1)
+fx<-dpois(x=x,lambda=5.295)
+plot(x,fx,type="h",xlab="Number of Sattelites (X)",ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+lines(x=2,dpois(x=2,lambda=5.295),col="red",lwd=2,type="h")
+
+#####Example Q2
+par(mfrow=c(1,2))
+ppois(q=2,lambda=5.295) #P(X<=2|lambda=5.295)
+#pmf
+x<-seq(from=-1,to=15,by=1)
+fx<-dpois(x=x,lambda=5.295)
+plot(x,fx,type="h",xlab="Number of Sattelites (X)",ylab=bquote(f[x](x)))
+abline(h=0) #adds the x-axis
+xvals<-c(0,1,2)
+lines(x=xvals,dpois(x=xvals,lambda=5.295),col="red",lwd=2,type="h")
+#cdf
+x<-seq(from=-1,to=15,by=1)
+Fx<-ppois(q=x,lambda=5.295)
+plotCDF(x,Fx,xlab="Number of Sattelites (X)",ylab=bquote(F[x](x)))
+points(2,ppois(q=2,lambda=5.295),pch=16,col="red")

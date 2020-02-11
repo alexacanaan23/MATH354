@@ -1,0 +1,112 @@
+########################################################################
+#### Mamogram Example
+########################################################################
+#########################
+## Key Values
+#########################
+x<-36
+n<-10000
+p0<-0.0033
+p.hat<-x/n
+alpha<-0.05
+#########################
+## Wald -- preferred
+#########################
+## Hypothesis Test
+mu.phat<-p0
+se.phat<-sqrt(p0*(1-p0)/n)
+pnorm(q=p.hat,mean=mu.phat,sd=se.phat,lower.tail=FALSE)
+## In terms of Z
+z.obs<-(p.hat-mu.phat)/se.phat  ##test statistic
+pnorm(z.obs,lower.tail=FALSE)   ##p value
+
+#########################
+## Visualization
+#########################
+ggdat<-data.frame(z=seq(-4.5,4.5,0.01),
+                  f=dnorm(x=seq(-4.5,4.5,0.01)))
+ggdat.highlight<-data.frame(x=z.obs,y=0)
+
+#Save the observations corresponding to z
+axis.labels<-c(round(c(0,qnorm(1-alpha))*se.phat+mu.phat,3),
+               round(p.hat,4))
+
+ggplot(data=ggdat,aes(x=z,y=f))+
+  geom_line()+
+  geom_ribbon(data=subset(ggdat,z>=qnorm(1-alpha)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA)+
+  geom_ribbon(data=subset(ggdat,z>=z.obs),aes(ymax=f),ymin=0,
+              fill="red",color=NA,alpha=0.25)+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y),color="red")+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab("z")+
+  ylab("Density")+
+  ggtitle("Wald Test for the Population Proportion",
+          subtitle=bquote(H[0]*":"~p==0.0033*{", versus "*H[a]*":"~p>0.0033}))+
+  annotate("text", x=2.5, y=0.07,
+           label= deparse(bquote(alpha==0.05)),parse=T,size=3.5)+ 
+  annotate("text", x=0, y=0.025, label="Observation",size=3.5)+
+  annotate("text", x=1.8, y=0.25, label=paste("P-value=",round(pnorm(z.obs,lower.tail=FALSE),4),sep=" "),size=3.5)+
+  scale_x_continuous(sec.axis = sec_axis(~., 
+                                         breaks=c(0,qnorm(1-alpha),z.obs),
+                                         labels = axis.labels,name="Proportion of Fatality Due to Breast Cancer"))
+#########################
+## Score -- (small sample)
+#########################
+## Hypothesis Test
+alpha<-0.05
+mu.phat<-p0
+se.phat<-sqrt(p.hat*(1-p.hat)/n)
+pnorm(q=p.hat,mean=mu.phat,sd=se.phat,lower.tail=FALSE)
+## In terms of Z
+z.obs<-(p.hat-mu.phat)/se.phat  ##test statistic
+pnorm(z.obs,lower.tail=FALSE)   ##p value
+
+
+
+#########################
+## Visualization
+#########################
+ggdat<-data.frame(z=seq(-4.5,4.5,0.01),
+                  f=dnorm(x=seq(-4.5,4.5,0.01)))
+ggdat.highlight<-data.frame(x=z.obs,y=0)
+
+#Save the observations corresponding to z
+axis.labels<-c(round(c(0,qnorm(1-alpha))*se.phat+mu.phat,3),
+               round(p.hat,4))
+
+ggplot(data=ggdat,aes(x=z,y=f))+
+  geom_line()+
+  geom_ribbon(data=subset(ggdat,z>=qnorm(1-alpha)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA)+
+  geom_ribbon(data=subset(ggdat,z>=z.obs),aes(ymax=f),ymin=0,
+              fill="red",color=NA,alpha=0.25)+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y),color="red")+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab("z")+
+  ylab("Density")+
+  ggtitle("Score Test for the Population Proportion",
+          subtitle=bquote(H[0]*":"~p==0.0033*{", versus "*H[a]*":"~p>0.0033}))+
+  annotate("text", x=2.5, y=0.07,
+           label= deparse(bquote(alpha==0.05)),parse=T,size=3.5)+ 
+  annotate("text", x=0, y=0.025, label="Observation",size=3.5)+
+  annotate("text", x=1.8, y=0.25, label=paste("P-value=",round(pnorm(z.obs,lower.tail=FALSE),4),sep=" "),size=3.5)+
+  scale_x_continuous(sec.axis = sec_axis(~., 
+                                         breaks=c(0,qnorm(1-alpha),z.obs),
+                                         labels = axis.labels,name="Proportion of Fatality Due to Breast Cancer"))
+
+
+#########################
+## Score Test (corrected)
+#########################
+prop.test(x=36,n=10000,p=0.0033,alternative="greater",conf.level=0.95)
+
+
+#########################
+## Exact Test
+#########################
+#install.packages("binom")
+library("binom")
+binom.test(x=36,n=10000,p=0.0033,alternative="greater",conf.level=0.95)

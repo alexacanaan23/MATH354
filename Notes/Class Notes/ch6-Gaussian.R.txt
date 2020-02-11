@@ -1,0 +1,158 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### Gaussian (Normal) Distribution
+########################################################################
+dnorm(x=0.20,mean=0,sd=1) #This the height of the PDF at x=0.20
+pnorm(q=2,mean=0,sd=1) #P(X<=2|mu=0,sigma=1)
+qnorm(p=0.90,mean=0,sd=1) #The 90th percentile
+rnorm(n=5,mean=0,sd=1) #A random sample of 5 Xi~Gaussian(mu=0,sigma=1)
+
+ggdat<-data.frame(x=seq(-6,6,0.001),
+                  f1=dnorm(x=seq(-6,6,0.001),mean=0,sd=1),
+                  f2=dnorm(x=seq(-6,6,0.001),mean=0,sd=3),
+                  f3=dnorm(x=seq(-6,6,0.001),mean=0,sd=0.5),
+                  f4=dnorm(x=seq(-6,6,0.001),mean=1,sd=1),
+                  f5=dnorm(x=seq(-6,6,0.001),mean=-1,sd=2))
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=f1,color="m=0 sd=1"))+
+  geom_line(aes(y=f2,color="m=0 sd=3"))+
+  geom_line(aes(y=f3,color="m=0 sd=0.50"))+
+  geom_line(aes(y=f4,color="m=1 sd=1"))+
+  geom_line(aes(y=f5,color="m=-1 sd=2"))+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Gaussian PDF",subtitle="For Various Parameter Values")+
+  scale_color_discrete("",breaks=c("m=0 sd=1","m=0 sd=3","m=0 sd=0.50",
+                                "m=1 sd=1","m=-1 sd=2"),
+                       labels=c(bquote(mu==0~","~sigma==0.50),
+                                bquote(mu==0~","~sigma==1),bquote(mu==0~","~sigma==3),
+                                bquote(mu==1~","~sigma==1),bquote(mu==-1~","~sigma==2)))
+
+
+ggdat<-data.frame(x=seq(-6,6,0.001),
+                  F1=pnorm(q=seq(-6,6,0.001),mean=0,sd=1),
+                  F2=pnorm(q=seq(-6,6,0.001),mean=0,sd=3),
+                  F3=pnorm(q=seq(-6,6,0.001),mean=0,sd=0.5),
+                  F4=pnorm(q=seq(-6,6,0.001),mean=1,sd=1),
+                  F5=pnorm(q=seq(-6,6,0.001),mean=-1,sd=2))
+g1.cdf<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=F1,color="m=0 sd=1"))+
+  geom_line(aes(y=F2,color="m=0 sd=3"))+
+  geom_line(aes(y=F3,color="m=0 sd=0.50"))+
+  geom_line(aes(y=F4,color="m=1 sd=1"))+
+  geom_line(aes(y=F5,color="m=-1 sd=2"))+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Gaussian CDF",subtitle="For Various Parameter Values")+
+  scale_color_discrete("",breaks=c("m=0 sd=1","m=0 sd=3","m=0 sd=0.50",
+                                   "m=1 sd=1","m=-1 sd=2"),
+                       labels=c(bquote(mu==0~","~sigma==0.50),
+                                bquote(mu==0~","~sigma==1),bquote(mu==0~","~sigma==3),
+                                bquote(mu==1~","~sigma==1),bquote(mu==-1~","~sigma==2)))
+
+grid.arrange(g1,g1.cdf,ncol=2)
+
+
+
+####Example
+1- pnorm(q=40,mean=45.5,sd=3.92)#Complement rule
+pnorm(q=40,mean=45.5,sd=3.92,lower.tail=FALSE)#Ask directly
+
+ggdat<-data.frame(x=seq(30,60,0.01),
+                  f1=dnorm(x=seq(30,60,0.01),mean=45.5,sd=3.92))
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=f1))+
+  geom_ribbon(data=subset(ggdat,x>40),aes(ymax=f1),ymin=0,
+              fill="red",colour=NA,alpha=0.5)+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("Housefly Wingspan in mm (X)")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Gaussian PDF",subtitle=bquote(P(X>40)~"for"~mu==45.5*","~sigma==3.92))
+
+
+ggdat<-data.frame(x=seq(30,60,0.01),
+                  F1=pnorm(q=seq(30,60,0.01),mean=45.5,sd=3.92))
+ggdat.highlight<-data.frame(x=40,
+                            y=pnorm(q=40,mean=45.5,sd=3.92))
+g1.cdf<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=F1))+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y),color="red")+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("Housefly Wingspan in mm (X)")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Gaussian CDF",subtitle=bquote(P(X<=40)~"for"~mu==45.5*","~sigma==3.92))
+
+grid.arrange(g1,g1.cdf,ncol=2)
+
+
+####Example
+pnorm(q=50,mean=45.5,sd=3.92)
+
+ggdat<-data.frame(x=seq(30,60,0.01),
+                  f1=dnorm(x=seq(30,60,0.01),mean=45.5,sd=3.92))
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=f1))+
+  geom_ribbon(data=subset(ggdat,x<=50),aes(ymax=f1),ymin=0,
+              fill="red",colour=NA,alpha=0.5)+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("Housefly Wingspan in mm (X)")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Gaussian PDF",subtitle=bquote(P(X<=50)~"for"~mu==45.5*","~sigma==3.92))
+
+
+ggdat<-data.frame(x=seq(30,60,0.01),
+                  F1=pnorm(q=seq(30,60,0.01),mean=45.5,sd=3.92))
+ggdat.highlight<-data.frame(x=50,
+                            y=pnorm(q=50,mean=45.5,sd=3.92))
+g1.cdf<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=F1))+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y),color="red")+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("Housefly Wingspan in mm (X)")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Gaussian CDF",subtitle=bquote(P(X<=50)~"for"~mu==45.5*","~sigma==3.92))
+
+grid.arrange(g1,g1.cdf,ncol=2)
+
+
+####Example
+pnorm(q=40,mean=45.5,sd=3.92) + (1-pnorm(q=50,mean=45.5,sd=3.92))
+
+ggdat<-data.frame(x=seq(30,60,0.01),
+                  f1=dnorm(x=seq(30,60,0.01),mean=45.5,sd=3.92))
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=f1))+
+  geom_ribbon(data=subset(ggdat,x<40),aes(ymax=f1),ymin=0,
+              fill="red",colour=NA,alpha=0.5)+
+  geom_ribbon(data=subset(ggdat,x>50),aes(ymax=f1),ymin=0,
+              fill="red",colour=NA,alpha=0.5)+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("Housefly Wingspan in mm (X)")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Gaussian PDF",subtitle=bquote(P(X<40)+P(X>50)~"for"~mu==45.5*","~sigma==3.92))
+
+
+ggdat<-data.frame(x=seq(30,60,0.01),
+                  F1=pnorm(q=seq(30,60,0.01),mean=45.5,sd=3.92))
+ggdat.highlight<-data.frame(x=c(40,50),
+                            y=pnorm(q=c(40,50),mean=45.5,sd=3.92))
+g1.cdf<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=F1))+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y),color="red")+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("Housefly Wingspan in mm (X)")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Gaussian CDF",subtitle=bquote(P(X<=40)~"and"~P(X<=50)~"for"~mu==45.5*","~sigma==3.92))
+
+grid.arrange(g1,g1.cdf,ncol=2)

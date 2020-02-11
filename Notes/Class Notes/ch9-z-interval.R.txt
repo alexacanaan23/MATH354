@@ -1,0 +1,101 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### T interval
+########################################################################
+alpha<-0.05
+ggdat<-data.frame(z=seq(from=-4,to=4,by=0.01),
+                  f=dnorm(seq(from=-4,to=4,by=0.01),mean=0,sd=1))
+ggdat.highlight<-data.frame(x=qnorm(p=c(alpha/2,1-alpha/2),mean=0,sd=1),
+                            y=c(0,0))
+ggplot(data=ggdat,aes(x=z,y=f))+
+  geom_line()+
+  geom_ribbon(data=subset(ggdat,z<=qnorm(alpha/2,mean=0,sd=1)),aes(ymax=f),ymin=0,
+              fill="grey",colour=NA,alpha=0.5)+ #note alpha here refers to color transparancy
+  geom_ribbon(data=subset(ggdat,z>=qnorm(1-alpha/2,mean=0,sd=1)),aes(ymax=f),ymin=0,
+              fill="grey",colour=NA,alpha=0.5)+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y))+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab("z")+
+  ylab("Density")+
+  annotate("text", x=-3, y=0.05, label= deparse(bquote(alpha/2)),parse=T,size=3.5)+ #deparse keeps bquote a string which is processed later
+  annotate("text", x=3, y=0.05, label= deparse(bquote(alpha/2)),parse=T,size=3.5)+
+  annotate("text", x=0, y=0.2, label= deparse(bquote(1-alpha)),parse=T,size=3.5)
+
+qnorm(1-alpha/2,mean=0,sd=1) ## upper 0.025 quantile
+qnorm(alpha/2,mean=0,sd=1) ## lower 0.025 quantile
+
+########################################################################
+#### Leaking Gas Tank Z interval
+########################################################################
+qnorm(p=0.975,mean=0,sd=1) ## upper 0.025 quantile
+
+y<-10
+n<-74
+
+y/n ##p hat
+sqrt(y/n(1-y/n)/n) ## se(p.hat)
+
+alpha<-0.05
+qnorm(1-alpha/2,mean=0,sd=1)
+
+#all intervals
+library("binom")
+y<-10
+n<-74
+binom.confint(x = y,n = 74,conf.level=0.95)
+
+
+#Wald Interval
+p.hat<-y/n
+se<-sqrt(p.hat*(1-p.hat)/n)
+z.quantile<-qnorm(1-alpha/2,mean=0,sd=1)
+p.hat+c(-1,1)*z.quantile*se
+
+#Agresti-Coull Interval
+z.quantile<-qnorm(1-alpha/2,mean=0,sd=1)
+p.tilde<-((y+.5*z.quantile^2)/(n+z.quantile^2))
+se<-sqrt(p.tilde*(1-p.tilde)/(n+qnorm(1-alpha/2,mean=0,sd=1)^2))
+p.tilde + c(-1,1)*z.quantile*se
+
+#Wilson Interval
+p.hat<-y/n
+z.quantile<-qnorm(1-alpha/2,mean=0,sd=1)
+p.tilde<-((y+.5*z.quantile^2)/(n+z.quantile^2))
+se<-sqrt(n*p.hat*(1-p.hat)+(z.quantile^2)/4)/(n+z.quantile^2)
+p.tilde + c(-1,1)*z.quantile*se
+
+
+########################################################################
+#### Cadmium T interval plot
+########################################################################
+alpha<-0.05 #significance level
+ggdat<-data.frame(z=seq(from=-4,to=4,by=0.01),
+                  f=dnorm(seq(from=-4,to=4,by=0.01),mean=0,sd=1))
+#plot a point at the 0.025 and 0.975 quantiles
+ggdat.highlight<-data.frame(x=qnorm(p = c(alpha/2,1-alpha/2),mean=0,sd=1),
+                            y=c(0,0))
+#Save the proportions corresponding to the confidence interval
+p.hat<-y/n
+z.quantile<-qnorm(1-alpha/2,mean=0,sd=1)
+p.tilde<-((y+.5*z.quantile^2)/(n+z.quantile^2))
+se<-sqrt(n*p.hat*(1-p.hat)+(z.quantile^2)/4)/(n+z.quantile^2)
+axis.labels<-round(c(qnorm(alpha/2,mean=0,sd=1),0,qnorm(1-alpha/2,mean=0,sd=1))*
+                     se + p.tilde,3)
+ggplot(data=ggdat,aes(x=z,y=f))+
+  geom_line()+
+  geom_ribbon(data=subset(ggdat,z<=qnorm(alpha/2,mean=0,sd=1)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+ 
+  geom_ribbon(data=subset(ggdat,z>=qnorm(1-alpha/2,mean=0,sd=1)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y))+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab("z")+
+  ylab("Density")+
+  annotate("text", x=-3.1, y=0.05, label= deparse(bquote(alpha/2==0.025)),parse=T,size=3.5)+ 
+  annotate("text", x=3.1, y=0.05, label= deparse(bquote(alpha/2==0.025)),parse=T,size=3.5)+
+  annotate("text", x=0, y=0.2, label= deparse(bquote(1-alpha==0.95)),parse=T,size=3.5)+
+  scale_x_continuous(sec.axis = sec_axis(~., breaks=c(qnorm(alpha/2,mean=0,sd=1),0,qnorm(1-alpha/2,mean=0,sd=1)),
+                                         labels = axis.labels,name="Proportion of Stations with at Least One Leaking Tank"))  

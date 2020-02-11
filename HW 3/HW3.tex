@@ -1,0 +1,93 @@
+\documentclass{article}
+\usepackage{amsmath} %This allows me to use the align functionality.
+                   %If you find yourself trying to replicate
+                   %something you found online, ensure you're
+                   %loading the necessary packages!
+\usepackage{amsfonts}%Math font
+\usepackage{graphicx}%For including graphics
+\usepackage{hyperref}%For Hyperlinks
+\usepackage{natbib}        %For the bibliography
+\bibliographystyle{apalike}%For the bibliography
+\usepackage[margin=1.0in]{geometry}
+\usepackage{float}
+\usepackage{Sweave}
+\begin{document}
+\input{HW3-concordance}
+%set the size of the graphs to fit nicely on a 8.5x11 sheet
+\noindent \textbf{MA 354: Data Analysis I -- Fall 2019}\\%\\ gives you a new line
+\noindent \textbf{Homework 3:}\vspace{1em}\\
+\emph{Complete the following opportunities to use what we've talked about in class. 
+These questions will be graded for correctness, communication and succinctness. Ensure
+you show your work and explain your logic in a legible and refined submission.}\\
+%Comments -- anything after % is not put into the PDF
+
+\begin{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 0
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item[0.] \textbf{Complete weekly diagnostics.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item  The goal of this question is to ensure you can simply explain it to yourself in preparation
+for the next exam and final. Think of this as an opportunity to make something 
+quick you can read that summarizes all of our discussions about this topic
+that you can study from later.
+
+\textbf{(Part A)} Map out a decision tree for the hypothesis testing methodologies
+we've discussed so far this semester. You might want to create this chart in
+a program other than \LaTeX.
+\newline
+\begin{figure}[h]
+   \includegraphics[totalheight=8cm]{boat.jpg}
+   \caption{Hypothesis Testing Methodologies Mapped}
+   \label{fig:boat1}
+ \end{figure}
+
+\textbf{(Part B)} Succinctly describe the difference between ANOVA, Mood's Median
+Test, and the Kruskal Wallis test.
+\newline
+All three tests aim to tell us if there's evidence that there's a difference across treatments/groups. ANOVA specifically tells us if there's a difference using means. It tests population variances within and across groups/treatments. It assumes normality of the population distribution, equal variance, and independent random sample. Mood's Median and Kruskal Wallis are the nonparametric versions of the ANOVA. Mood's Median test uses medians and does not require normality of the underlying data or equal variances. Kruskal Wallis uses the mean population ranks. It also does not require Gaussian distributed data or equal variances, and can be applied to discrete or continuous data. 
+
+\textbf{(Part C)} What is the purpose of post hoc testing in relation to the tests
+described in Part B.
+\newline
+The purpose of post-hoc testing after omnibus testing is to identify specifically which treatments/subgroups are different after omnibus testing identifies whether or not there is any difference. They require adjustments for multiple comparisons. Tukey HSD is used for ANOVA, Pairwise Mood's Median Test and Pairwise bootstrapping are used for Mood's Median Test, and Dunn's Test is used for Kruskal Wallis. This is where correction for multiple comparisons occurs.
+
+\textbf{(Part D)} Succinctly describe the difference between 
+Pearson correlation, Spearman's rank correlation, and Kendall's
+Tau b correlation.
+\newline
+All of these correlation methods aim to identify if there is a relationship between 2 quantitative variables. Pearson's correlation identifies the linear relationship and assumes a continuous distribution with no outliers, both variables are Gaussian distributed, the pairs of observations are independent, and the sample is generalized. Kendall's Tau and Spearman's Rank identify if there is a monotone bivariate relationship. Kendall's Tau is always lower than Spearman's rank and is the rank-based correlation. Spearman's rank is robust to outliers.
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\item \textbf{(Twitter)} The data consist of a subset of 248,915 tweets, in English, 
+excluding retweets and quotes, that contain ``self-injurious behavior", 
+``self injurious behaviour", ``non suicidal self injury", or ``self harm" from June
+1, 2018, through May 31, 2019 obtained from the premium Twitter API. 
+
+We noticed a significant spike in Twitter activity in and around the news that 
+Instagram would ban graphic images of self-harm (February 7, 2019). By far, the 
+greatest volume of Twitter activity occurred in the few days after the imposition 
+of the ban.
+
+Of interest to us is how this event changed the discourse about self-harm and
+Instagram on Twitter. Below, we provide 5,875 tweets that mention Instagram,
+but not Facebook or Twitter, from the full dataset. You'll need to download
+the Excel file from Moodle and place Q2Tweets.csv into your working folder,
+and erase \texttt{eval$=$FALSE}.
+\begin{Schunk}
+\begin{Sinput}
+> tweets<-read.csv(file="/Users/canaan/Q2Tweets.csv",header = TRUE, sep = ","
++                  ,stringsAsFactors = FALSE)

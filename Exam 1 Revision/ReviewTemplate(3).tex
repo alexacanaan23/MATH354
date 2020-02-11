@@ -1,0 +1,67 @@
+\documentclass{article}
+\usepackage{amsmath} %This allows me to use the align functionality.
+                     %If you find yourself trying to replicate
+                     %something you found online, ensure you're
+                     %loading the necessary packages!
+\usepackage{amsfonts}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{float}
+\usepackage{graphicx} 
+\usepackage{natbib} %For the bibliography
+\bibliographystyle{apalike}%For the bibliography
+\setlength\parindent{0pt}
+\usepackage{Sweave}
+\begin{document}
+\input{ReviewTemplate(3)-concordance}
+\begin{center}
+  {\LARGE Responses to Reviews for Exam Number One}\\\vspace{1em}
+\end{center}
+
+I greatly appreciated the feedback I received from both reviewers. I relied on their suggestions heavily when editing my work and created a better draft with their ideas than I could have just on my own. 
+\newline
+\newline
+R1's Overall Rating: 3 - The review was helpful to my revision because it pointed out the major flaws in my draft, such as the fact that I used counts instead of proportions in my graphs and that my graphical formatting was hard to understand. These points motivated me to overhaul my previous ggplots and make new ones that accurately reflected the data and directly addressed questions researchers were trying to answer. However, while the review pointed out these blatant flaws and was helpful, it was not necessarily comprehensive. It was not helpful with more nuanced issues such as when I trying to make my analyses more clear and concise or attempting to answer Q2. This made it harder for me to turn my good revision into a great revision.   
+\newline
+\newline
+R2's Overall Rating: 5 - The review was incredibly important to my revision because not only did it look at issues related to my work, but it helped me to look forward at Q2 and develop a thought process for how I may address similar questions in the future. The feedback allowed me to revisit my ggplots, but also pushed me to dive deeper into my analyses.\\
+
+\textbf{Major Issues:} Below, I address the major issues that reviewers observed in the analyses and interpretations. I respond to their comments below. 
+\begin{enumerate}
+  \item R1: Page 3, line 217-218: "I think there would need to be a density plot to show this. " Thank you for this suggestion. I fixed my ggplots so that they show proportions instead of counts on the y axis, which allows for easier comparison between HOA and non HOA homes.
+  \item R2: Pages 5-11, lines 232-243: "You do not analyze these plots (though it seems, based on your intro to the neighborhood-level comparisons, that this was as a factor of time). What conclusions can we draw on the neighborhood level? " Thank you for pointing out this lack of analyses. I removed these plots from my final draft, so this is no longer an issue.
+  \item R2: Page 11, line 243: "You don’t include any plots looking at lawn care, gardening, or trees on a neighborhood level. If you had time to do so, what conclusions would you have looked to draw?" If I had time, I would've looked at how different sustainability factors interact with each other at the neighborhood level to see if any of these factors were correlated.  
+\end{enumerate}
+
+\textbf{Minor Issues:} Below, I address the minor issues that reviewers observed in the analyses and interpretations. I respond to their comments below.
+\begin{enumerate}
+  \item R1: Page 5, line 232, 233, 234, 240, 243: "Would have been better to be done categoricaly and try to fit it all on the same graph, or as a table of frequencies." Unfortunately under time constraints I was unable to address this issue in the exam. I addressed this problem for my final draft by editing my ggplots so the data frames that they were made from used relative frequencies instead of counts. 
+  \item R1: Page 3, line 203: "There is no explanation for what 2 represents in the graph as it was cut off. I assume 
+that it was ”just trash pickup” but it would have been nice to see it." Thank you for pointing out this formatting issue. I revised my plots so that instead of each factor being represented by its number, it is represented by a character label with meaning. 
+  \item R2: Page 2, line 190: "You don’t comment on the summary table produced- why is this useful information?" Thank you for pointing me to this lack of analyses. I address why the summary table is important and connect it to the HOA vs. non HOA research question.  
+  \item R2: Page 2, line 192: "Question marks. I am not sure if these are supposed to be citations or if it’s a minor 
+error with a plot title. " These questions marks marked that I had an issue with my citations. I fixed this for my final draft. 
+  \item R2: Page 3, line 193: "Remember to add a line at y=0." Thank you for this advice. I always try to remember to do this but forgot in the moment. 
+  \item R2: Page 3, line 193: "You do make note of this, but a relative frequency barplot would be more informative to the reader. This also applies to all other plots (especially side-by-side figures, which you used for comparison on the homeowner level). " Thank you for reiterating this point. I fixed my ggplots so that they have relative frequencies instead of counts so that I can make more accurate comparisons. 
+  \item R2: Page 3, line 203: "The subtitle is cutoff. I see why you’re including label descriptions, but in the revision you may want to consider using a legend. The legend can also be applied to the plots found on lines 207 and 219, as well as 232-243." Thank you for pointing out this formatting issue. I revised my plots so that instead of each factor being represented by its number, it is represented by a character label with meaning. 
+  \item R2: Page 4, line 209: "Do you mean ”infer that” or ”conclude that” rather than draw?" Yes I did, thank you for pointing this out, I changed "draw" to "infer". 
+  \item R2: Page 4, lines 211-213: "Though you include what the labels indicate in your plot subtitles, because this is the written analysis, you may want to articulate what scores of 2-3 or 1-4 mean. Also, the way you’ve worded it, you make it seem like homes in HOA are most frequently found at a rating of 1 OR 4 and not the full range, which I think is what you meant." I changed my ggplot labels from numbers to characteristics so that it is more clear what specific information I'm referencing. I reworded my analysis to reflect that HOA homes are found on the full range of lawn care. 
+  \item R2: Page 4, line 214: "It seems as though you transition from using a barplot to using a histogram, so you may want to make a note of why you can do so, as the Trees variable is still a discrete, countable variable. It also may be useful to mention the skew of the histograms." Thank you for these suggestions! When I remade my graphs I used geomcol because this is the function that would take the tree data. Geomhistogram would not take the tree data. It's important to note that while the trees variable is discrete, bar graphs are used typically when there are only a few categories of data. I was sure to mention the skewnessin my new analysis. 
+  \item R2: Page 5, line 231: "Do you mean ”neighborhoods” instead of ”towns”?" Thank you for pointing out this discrepancy, I made the appropriate change. 
+  \item R2: Page 5, line 232: "You may want to look into how to adjust the bar width of these plots; on first glance I was confused by what this plot was indicating (it seems the entire neighborhood offers no curbside pick-up), as the 1 and 2 options aren’t visible on the x-axis." I removed the plots from my final draft so this is no longer an issue.  
+  \item R2: Page 11, line 244: "I am not sure if you have references you’d like to add (such as the packages you used), but if you do, those should go here. " I had issues with my citations, but this should be resolved now.
+
+
+\end{enumerate}
+
+\textbf{Typographical Issues:} Below is a list of typos that reviewers found while reading the analyses. This is not an exhaustive list.
+\begin{enumerate}
+  \item R1: Page 2, line 192: "I do not understand what these question marks are for." 
+  The question marks are citations that were not properly inputted into LaTex. I fixed those citations for my final draft. 
+  \item R1: Page 5, line 255: "Whay the '...'?"
+  That was a stylistic choice but I can see how that can be confusing. I changed it so that there are no "..." anymore. 
+  \item R2: Page 2, line 185: "Missing comma between ”all” and ”we” " Thank you for pointing this out. I changed the period to a comma. 
+  \item R2: Page 4, line 216: "Missing comma between ”frequency” and ”it”"  I removed this sentence from my analysis so this is no longer an issue, but thank you for pointing this out.
+  \item R2: Page 5, line 225: "Remove ellipses ”...” " That was a stylistic choice but I can see how that can be confusing. I changed it so that there are no "..." anymore. 
+\end{enumerate}
+
+\end{document}

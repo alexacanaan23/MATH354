@@ -1,0 +1,24 @@
+\begin{thebibliography}{}
+
+\bibitem[Auguie, 2017]{gridExtra}
+Auguie, B. (2017).
+\newblock {\em gridExtra: Miscellaneous Functions for "Grid" Graphics}.
+\newblock R package version 2.3.
+
+\bibitem[Dorai-Raj, 2014]{binom}
+Dorai-Raj, S. (2014).
+\newblock {\em binom: Binomial Confidence Intervals For Several
+  Parameterizations}.
+\newblock R package version 1.1-1.
+
+\bibitem[Hasselman, 2018]{nleqslv}
+Hasselman, B. (2018).
+\newblock {\em nleqslv: Solve Systems of Nonlinear Equations}.
+\newblock R package version 3.3.2.
+
+\bibitem[Wickham, 2016]{ggplot}
+Wickham, H. (2016).
+\newblock {\em ggplot2: Elegant Graphics for Data Analysis}.
+\newblock Springer-Verlag New York.
+
+\end{thebibliography}

@@ -1,0 +1,81 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### Filling process data
+########################################################################
+
+#########################
+#### Load Data
+#########################
+dat.filling<-data.frame(process.1=c(127.75,127.87,127.86,127.92,128.03,127.94,127.91,128.10,
+                                    128.01,128.11,127.79,127.93,127.89,127.96,127.80,127.94,
+                                    128.02,127.82,128.11,127.92,127.74,127.78,127.85,127.96),
+                        process.2=c(127.90,127.90,127.74,127.93,127.62,127.76,127.63,127.93,
+                                    127.86,127.73,127.82,127.84,128.06,127.88,127.85,127.60,
+                                    128.02,128.05,127.95,127.89,127.82,127.92,127.71,127.78))
+
+ggdat<-data.frame(ounces=c(dat.filling$process.1,dat.filling$process.2),
+                  process=c(rep("Process 1",24),rep("Process 2",24)))
+
+#########################
+#### Plot data
+#########################
+ggplot(data=ggdat,aes(x=process, y=ounces))+
+  geom_violin(fill="lightblue")+
+  geom_boxplot(width=0.25)+
+  theme_bw()+
+  xlab("Process")+
+  ylab("Fluid Ounces")
+
+#########################
+#### Having R do it
+#########################
+var.test(x=dat.filling$process.2, #top
+         y=dat.filling$process.1, #bottom
+         conf.level=0.95)
+
+#########################
+#### Check For Normality
+#########################
+library("qqplotr")
+ggplot(data=ggdat,aes(sample=ounces))+
+  stat_qq_band(alpha=0.25) +
+  stat_qq_line() +
+  stat_qq_point() +
+  theme_bw()+
+  xlab("Gaussian Quantiles")+
+  ylab("Sample Quantiles")+
+  facet_grid(. ~ process)
+
+#########################
+#### Plot Confidence Interval
+#########################
+alpha<-0.05 #significance level
+test<-var.test(x=dat.filling$process.2, #top
+               y=dat.filling$process.1, #bottom
+               conf.level=0.95)
+
+ggdat<-data.frame(f=seq(from=0,to=4,by=0.01),
+                  f1=df(seq(from=0,to=4,by=0.01),df1=test$parameter[1],df2=test$parameter[2]))
+ggdat.highlight<-data.frame(x=qf(p = c(alpha/2,1-alpha/2),df1=test$parameter[1],df2=test$parameter[2]),
+                            y=c(0,0))
+axis.labels<-round(c(qf(alpha/2,df1=test$parameter[1],df2=test$parameter[2]),
+                     qf(1-alpha/2,df1=test$parameter[1],df2=test$parameter[2]))*test$estimate,3)
+ggplot(data=ggdat,aes(x=f,y=f1))+
+  geom_line()+
+  geom_ribbon(data=subset(ggdat,f<=qf(alpha/2,df1=test$parameter[1],df2=test$parameter[2])),aes(ymax=f1),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+ 
+  geom_ribbon(data=subset(ggdat,f>=qf(1-alpha/2,df1=test$parameter[1],df2=test$parameter[2])),aes(ymax=f1),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y))+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab("f")+
+  ylab("Density")+
+  annotate("text", x=0.05, y=0.075, label= deparse(bquote(alpha/2==0.025)),parse=T,size=3.5)+ 
+  annotate("text", x=3.1, y=0.075, label= deparse(bquote(alpha/2==0.025)),parse=T,size=3.5)+
+  annotate("text", x=1, y=0.2, label= deparse(bquote(1-alpha==0.95)),parse=T,size=3.5)+
+  scale_x_continuous(sec.axis = sec_axis(~., breaks=c(qf(alpha/2,df1=test$parameter[1],df2=test$parameter[2]),
+                                                      qf(1-alpha/2,df1=test$parameter[1],df2=test$parameter[2])),
+                                         labels = axis.labels,name="Ratio of the Variances of Fill Processes")) 
+

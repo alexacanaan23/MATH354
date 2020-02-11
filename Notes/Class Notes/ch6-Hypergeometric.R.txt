@@ -1,0 +1,191 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### Hypergeometric Distribution
+########################################################################
+dhyper(x=1,m=20,n=90,k=5) #P(X=1|m=20,n=90,k=5)
+phyper(q=1,m=20,n=90,k=5) #P(X<=1|m=20,n=90,k=5)
+qhyper(p=0.9,m=20,n=90,k=5) #The 90th percentile
+rhyper(nn=10,m=20,n=90,k=5) #A random sample of 20 Xi~Hyper(m=20,n=90,k=5)
+
+
+ggdat<-data.frame(x=(-1:21),
+                  f1=dhyper(x=(-1:21),m=20,n=90,k=5),
+                  F1=phyper(q=(-1:21),m=20,n=90,k=5),
+                  f2=dhyper(x=(-1:21),m=20,n=90,k=20),
+                  F2=phyper(q=(-1:21),m=20,n=90,k=20),
+                  f3=dhyper(x=(-1:21),m=20,n=90,k=45),
+                  F3=phyper(q=(-1:21),m=20,n=90,k=45),
+                  f4=dhyper(x=(-1:21),m=20,n=90,k=80),
+                  F4=phyper(q=(-1:21),m=20,n=90,k=80))
+#####1
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f1), ymin=0)+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlim(0,20)+
+  ylim(0,0.50)+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Hypergeometric PMF",subtitle="m=20, n=90, k=5")
+
+ggdat.openpoints<-data.frame(x=ggdat$x,
+                             y=phyper(ggdat$x-1,m=20,n=90,k=5))
+ggdat.closedpoints<-data.frame(x=ggdat$x,
+                               y=phyper(ggdat$x,m=20,n=90,k=5))
+g1.CDF<-ggplot(data=ggdat, aes(x = x, y = F1)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Hypergeometric CDF",subtitle="m=20, n=90, k=5")
+
+#####2
+g2<-ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f2), ymin=0)+
+  geom_hline(yintercept=0)+
+  ylim(0,0.50)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Hypergeometric PMF",subtitle="m=20, n=90, k=20")
+
+ggdat.openpoints<-data.frame(x=ggdat$x,
+                             y=phyper(ggdat$x-1,m=20,n=90,k=20))
+ggdat.closedpoints<-data.frame(x=ggdat$x,
+                               y=phyper(ggdat$x,m=20,n=90,k=20))
+g2.CDF<-ggplot(data=ggdat, aes(x = x, y = F2)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Hypergeometric CDF",subtitle="m=20, n=90, k=20")
+
+#####3
+g3<-ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f3), ymin=0)+
+  geom_hline(yintercept=0)+
+  ylim(0,0.50)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Hypergeometric PMF",subtitle="m=20, n=90, k=45")
+
+ggdat.openpoints<-data.frame(x=ggdat$x,
+                             y=phyper(ggdat$x-1,m=20,n=90,k=45))
+ggdat.closedpoints<-data.frame(x=ggdat$x,
+                               y=phyper(ggdat$x,m=20,n=90,k=45))
+g3.CDF<-ggplot(data=ggdat, aes(x = x, y = F3)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Hypergeometric CDF",subtitle="m=20, n=90, k=45")
+
+#####4
+g4<-ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f4), ymin=0)+
+  geom_hline(yintercept=0)+
+  ylim(0,0.50)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Hypergeometric PMF",subtitle="m=20, n=90, k=80")
+
+ggdat.openpoints<-data.frame(x=ggdat$x,
+                             y=phyper(ggdat$x-1,m=20,n=90,k=80))
+ggdat.closedpoints<-data.frame(x=ggdat$x,
+                               y=phyper(ggdat$x,m=20,n=90,k=80))
+g4.CDF<-ggplot(data=ggdat, aes(x = x, y = F4)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Hypergeometric CDF",subtitle="m=20, n=90, k=80")
+
+grid.arrange(g1,g1.CDF,
+             g2,g2.CDF,
+             g3,g3.CDF,
+             g4,g4.CDF,ncol=2)
+
+####Example
+1-dhyper(x=0,m=10,n=90,k=5) #1-P(X=0|m=10,n=90,k=5)
+ggdat<-data.frame(x=(-1:6),
+                  f1=dhyper(x=(-1:6),m=10,n=90,k=5),
+                  F1=phyper(q=(-1:6),m=10,n=90,k=5))
+ggdat.highlight<-data.frame(x=(1:6),
+                            f1=dhyper(x=(1:6),m=10,n=90,k=5))
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f1), ymin=0)+
+  geom_linerange(data=ggdat.highlight,aes(ymax=f1), ymin=0,color="red")+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("Defective Items (X)")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Hypergeometric PMF",subtitle=bquote(P(X>0)~"for m=10, n=90, k=5"))
+
+ggdat.openpoints<-data.frame(x=ggdat$x,
+                             y=phyper(ggdat$x-1,m=10,n=90,k=5))
+ggdat.closedpoints<-data.frame(x=ggdat$x,
+                               y=phyper(ggdat$x,m=10,n=90,k=5))
+ggdat.highlight<-data.frame(x=0,
+                            y=phyper(0,m=10,n=90,k=5))
+g1.CDF<-ggplot(data=ggdat, aes(x = x, y = F1)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_point(data = ggdat.highlight, aes(x = x, y = y),color="red") +
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("Defective Items (X)")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Hypergeometric CDF",subtitle=bquote(P(X<=0)~"for m=10, n=90, k=5"))
+grid.arrange(g1,g1.CDF,ncol=2)
+
+
+####Example
+1-phyper(q=2,m=10,n=90,k=5) #1-P(X<=2|m=10,n=90,k=5)
+ggdat<-data.frame(x=(-1:6),
+                  f1=dhyper(x=(-1:6),m=10,n=90,k=5),
+                  F1=phyper(q=(-1:6),m=10,n=90,k=5))
+ggdat.highlight<-data.frame(x=(3:6),
+                            f1=dhyper(x=(3:6),m=10,n=90,k=5))
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f1), ymin=0)+
+  geom_linerange(data=ggdat.highlight,aes(ymax=f1), ymin=0,color="red")+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("Defective Items (X)")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Hypergeometric PMF",subtitle=bquote(P(X>=3)~"for m=10, n=90, k=5"))
+
+ggdat.openpoints<-data.frame(x=ggdat$x,
+                             y=phyper(ggdat$x-1,m=10,n=90,k=5))
+ggdat.closedpoints<-data.frame(x=ggdat$x,
+                               y=phyper(ggdat$x,m=10,n=90,k=5))
+ggdat.highlight<-data.frame(x=2,
+                            y=phyper(2,m=10,n=90,k=5))
+g1.CDF<-ggplot(data=ggdat, aes(x = x, y = F1)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_point(data = ggdat.highlight, aes(x = x, y = y),color="red") +
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("Defective Items (X)")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Hypergeometric CDF",subtitle=bquote(P(X<=2)~"for m=10, n=90, k=5"))
+grid.arrange(g1,g1.CDF,ncol=2)
+

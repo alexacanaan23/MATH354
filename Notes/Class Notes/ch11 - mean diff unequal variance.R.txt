@@ -1,0 +1,77 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### Example paper disgarded
+########################################################################
+
+#########################
+#### Load Data
+#########################
+ggdat<-data.frame(lbs.disgarded=c(3.01,2.58,3.04,1.75,2.87,2.57,2.51,2.93,
+                                  2.85,3.09,1.43,3.36,3.18,2.74,2.25,1.95,
+                                  3.68,2.29,1.86,2.63,2.83,2.04,2.23,1.92,
+                                  3.02,3.99,2.08,3.66,1.53,4.27,4.31,2.62,
+                                  4.52,3.80,5.30,3.41,0.82,3.03,1.95,6.45,
+                                  1.86,1.87,3.98,2.74,4.81),
+                  plant=c(rep("Plant 1",25),rep("Plant 2",20)))
+
+#########################
+#### Plot to check variances
+#########################
+ggplot(data=ggdat,aes(x=plant, y=lbs.disgarded))+
+  geom_violin(fill="lightblue")+
+  geom_boxplot(width=0.25)+
+  theme_bw()+
+  xlab("Sampling Plant")+
+  ylab("Paper Disgarded (100s of pounds)")
+
+#########################
+#### Having R do it
+#########################
+t.test(x=ggdat$lbs.disgarded[which(ggdat$plant=="Plant 1")],
+       y=ggdat$lbs.disgarded[which(ggdat$plant=="Plant 2")],
+       conf.level=0.95,var.equal=FALSE)
+
+#########################
+#### Check For Normality
+#########################
+library("qqplotr")
+ggplot(data=ggdat,aes(sample=lbs.disgarded))+
+  stat_qq_band(alpha=0.25) +
+  stat_qq_line() +
+  stat_qq_point() +
+  theme_bw()+
+  xlab("Gaussian Quantiles")+
+  ylab("Sample Quantiles")+
+  facet_grid(. ~ plant)
+
+#########################
+#### Plot Confidence Interval
+#########################
+alpha<-0.05 #significance level
+test<-t.test(x=ggdat$lbs.disgarded[which(ggdat$plant=="Plant 1")],
+             y=ggdat$lbs.disgarded[which(ggdat$plant=="Plant 2")],
+             conf.level=0.95,var.equal=FALSE)
+
+ggdat<-data.frame(t=seq(from=-4,to=4,by=0.01),
+                  f=dt(seq(from=-4,to=4,by=0.01),df=test$parameter))
+ggdat.highlight<-data.frame(x=qt(p = c(alpha/2,1-alpha/2),df=test$parameter),
+                            y=c(0,0))
+axis.labels<-round(c(qt(alpha/2,test$parameter),0,qt(1-alpha/2,test$parameter))*
+                     test$stderr + (-diff(test$estimate)),3)
+ggplot(data=ggdat,aes(x=t,y=f))+
+  geom_line()+
+  geom_ribbon(data=subset(ggdat,t<=qt(alpha/2,df=test$parameter)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+ 
+  geom_ribbon(data=subset(ggdat,t>=qt(1-alpha/2,df=test$parameter)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y))+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab("t")+
+  ylab("Density")+
+  annotate("text", x=-3.1, y=0.05, label= deparse(bquote(alpha/2==0.025)),parse=T,size=3.5)+ 
+  annotate("text", x=3.1, y=0.05, label= deparse(bquote(alpha/2==0.025)),parse=T,size=3.5)+
+  annotate("text", x=0, y=0.2, label= deparse(bquote(1-alpha==0.95)),parse=T,size=3.5)+
+  scale_x_continuous(sec.axis = sec_axis(~., breaks=c(qt(alpha/2,test$parameter),0,qt(1-alpha/2,test$parameter)),
+                                         labels = axis.labels,name="Difference of Paper Disgarded (100s of pounds)"))  

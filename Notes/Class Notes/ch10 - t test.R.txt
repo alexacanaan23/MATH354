@@ -1,0 +1,68 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### Rock Crab Example
+########################################################################
+#########################
+## Key Values
+#########################
+library("MASS")
+data(crabs)
+orangeCrabs<-crabs[which(crabs$sp=="O"),] ##grabs only the data needed
+
+n<-length(orangeCrabs$CW)
+mu0<-34
+x.bar<-mean(orangeCrabs$CW)
+alpha<-0.05
+
+#########################
+## t-test
+#########################
+## Hypothesis Test
+mu.xbar<-mu0
+se.xbar<-sd(orangeCrabs$CW)/sqrt(n)
+## In terms of T
+t.obs<-(x.bar-mu.xbar)/se.xbar  ##test statistic
+(p.value<-2*pt(-abs(t.obs),df=n-1)) ##p value
+
+#Functionality in R:
+t.test(x=orangeCrabs$CW,mu=34,alternative="two.sided",conf.level=0.95)
+
+#########################
+## Visualization
+#########################
+ggdat<-data.frame(t=seq(-4.5,4.5,0.01),
+                  f=dt(x=seq(-4.5,4.5,0.01),df=n-1))
+ggdat.highlight<-data.frame(x=c(-t.obs,t.obs),y=c(0,0))
+
+#Save the observations corresponding to z
+axis.labels<-round(c(-abs(t.obs),qt(alpha/2,df=n-1),0,qt(1-alpha/2,df=n-1),abs(t.obs))*se.xbar+mu.xbar,2)
+
+ggplot(data=ggdat,aes(x=t,y=f))+
+  geom_line()+
+  geom_ribbon(data=subset(ggdat,t>=qt(1-alpha/2,df=n-1)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA)+
+  geom_ribbon(data=subset(ggdat,t<=qt(alpha/2,df=n-1)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA)+
+  geom_ribbon(data=subset(ggdat,t>=abs(t.obs)),aes(ymax=f),ymin=0,
+              fill="red",color=NA,alpha=0.25)+
+  geom_ribbon(data=subset(ggdat,t<=-abs(t.obs)),aes(ymax=f),ymin=0,
+              fill="red",color=NA,alpha=0.25)+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y),color="red")+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab("t")+
+  ylab("Density")+
+  ggtitle("T Test for the Population Mean",
+          subtitle=bquote(H[0]*":"~mu==34*{", versus "*H[a]*":"~mu!=34}))+
+  annotate("text", x=3, y=0.07,
+           label= deparse(bquote(alpha/2==0.025)),parse=T,size=3.5)+ 
+  annotate("text", x=-3, y=0.07,
+           label= deparse(bquote(alpha/2==0.025)),parse=T,size=3.5)+ 
+  annotate("text", x=5.25, y=0.03, label="Observation",size=3.5)+
+  annotate("text", x=-5.25, y=0.06, label="Mirrored \n Observation",size=3.5)+
+  annotate("text", x=5, y=0.25, label="P-value<0.0001",size=3.5)+
+  scale_x_continuous(sec.axis = sec_axis(~., 
+                                         breaks=c(-abs(t.obs),qt(alpha/2,n-1),0,qt(1-alpha/2,n-1),abs(t.obs)),
+                                         labels = axis.labels,name="Average Carapace Width (mm)"))
+

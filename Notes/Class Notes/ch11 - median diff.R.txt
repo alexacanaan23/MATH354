@@ -1,0 +1,93 @@
+########################################################################
+#### Boston Housing example
+########################################################################
+#########################
+#### Load Data
+#########################
+library("MASS")
+data("Boston")
+#Change to factor
+Boston$chas<-ifelse(Boston$chas=="0","Doesn't Border Charles River","Borders Charles River")
+
+#########################
+#### Plot data
+#########################
+ggplot(data=Boston,aes(x=chas, y=medv))+
+  geom_violin(fill="lightblue")+
+  geom_boxplot(width=0.25)+
+  theme_bw()+
+  xlab("")+
+  ylab("Median Value of Homes in $1000s")
+
+#########################
+#### ``By Hand"
+#########################
+m.hats<-rep(NA,1000)
+for(i in 1:1000){
+  newsamp1<-sample(x=Boston$medv[which(Boston$chas=="Doesn't Border Charles River")],
+                   size=length(Boston$medv[which(Boston$chas=="Doesn't Border Charles River")]),
+                   replace = TRUE)
+  newsamp2<-sample(x=Boston$medv[which(Boston$chas=="Borders Charles River")],
+                   size=length(Boston$medv[which(Boston$chas=="Borders Charles River")]),
+                   replace = TRUE)
+  m.hats[i]<-median(newsamp1)-median(newsamp2)
+}
+quantile(x=m.hats,probs=c(0.025,0.975))
+
+#########################
+#### Having R do it
+#########################
+boot.median<-function(data,indices){
+  d<-data[indices]# allows boot to select sample
+  return(median(d))
+}
+library("simpleboot")
+boot<-two.boot(sample1=Boston$medv[which(Boston$chas=="Doesn't Border Charles River")],
+               sample2=Boston$medv[which(Boston$chas=="Borders Charles River")],
+               FUN=boot.median, R=1000)
+library("boot")
+(ci<-boot.ci(boot.out=boot,conf=0.95,type="perc"))
+
+#########################
+#### Plotting it
+#########################
+ggdat<-data.frame(m.hats=boot$t)
+lower<-ci$percent[4]
+upper<-ci$percent[5]
+#Start plot
+p<-ggplot(data=ggdat,aes(x=m.hats))+
+  geom_density(color="black")
+#Grab density data from the ggplot
+d <- data.frame(x=ggplot_build(p)$data[[1]]$x,
+                f=ggplot_build(p)$data[[1]]$density)
+#Finish plot
+ggplot(data=d,aes(x=x,y=f))+
+  geom_line(color="black")+ 
+  geom_ribbon(data=subset(d,x<lower),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+
+  geom_ribbon(data=subset(d,x>upper),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab("Median Difference in Median Value of Homes")+
+  ylab("Density")+
+  annotate("text", x=-9,y=0.025,label= deparse(bquote(alpha/2==0.025)),parse=TRUE,size=3.5)+ 
+  annotate("text", x=1,y=0.025,label= deparse(bquote(alpha/2==0.025)),parse=TRUE,size=3.5)+
+  annotate("text", x=-3,y=0.10,label= deparse(bquote(1-alpha==0.95)),parse=TRUE,size=3.5)
+
+#########################
+#### Median Test -- we need some additional information to understand this test
+#########################
+library(RVAideMemoire)
+library(MASS)
+
+medv.dat <- Boston$medv #median value data
+medv.group<- Boston$chas
+overall.median <- median(medv.dat) #overall median
+table(medv.group,medv.dat<overall.median)
+prop.table(table(medv.group,medv.dat<overall.median),margin = 1)
+
+# fisher.test(table(cw.dat<overall.median,cw.group))$p.value
+# chisq.test(table(cw.dat<overall.median,cw.group))$p.value
+
+mood.medtest(medv~chas,data = Boston)

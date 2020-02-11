@@ -1,0 +1,49 @@
+library(ggplot2)
+library(gridExtra)
+########################################################################
+########################################################################
+#### Kruskal Wallis
+########################################################################
+########################################################################
+########################################################################
+#### Mortar Example
+########################################################################
+dat.mortar<-data.frame(strength=c(51.45,42.96,41.11,48.06,38.27,38.88,42.74,49.62,
+                                  64.97,64.21,57.39,52.79,64.87,53.27,51.24,55.87,61.76,67.15,
+                                  48.95,62.41,52.11,60.45,58.07,52.16,61.71,61.06,57.63,56.80,
+                                  35.28,38.59,48.64,50.99,51.52,52.85,46.75,48.31),
+                       type=c(rep("OCM",8),rep("PIM",10),rep("RM",10),rep("PCM",8)))
+
+kruskal.test(strength~type,data=dat.mortar)
+
+####By hand
+dat.mortar
+rank(dat.mortar$strength)
+
+dat.mortar.kw<-cbind(dat.mortar,strength.rank=rank(dat.mortar$strength))
+n<-nrow(dat.mortar.kw)
+(counts<-tapply(dat.mortar.kw$strength.rank,FUN=length,INDEX=dat.mortar.kw$type))
+(sums<-tapply(dat.mortar.kw$strength.rank,FUN=sum,INDEX=dat.mortar.kw$type))
+(means<-tapply(dat.mortar.kw$strength.rank,FUN=mean,INDEX=dat.mortar.kw$type))
+length(dat.mortar.kw$strength.rank)
+sum(dat.mortar.kw$strength.rank)
+mean(dat.mortar.kw$strength.rank)
+(H<-sum(counts*(means-mean(dat.mortar.kw$strength.rank))^2)/(n*(n+1)/12))
+
+1-pchisq(q=H,df=3)
+
+#########################
+## Pairwise comparisons
+#########################
+library(FSA)
+(DT<-dunnTest(strength~type,data=dat.mortar,method="bh"))
+
+#Use Dunns
+#pairwise.wilcox.test(dat.mortar$strength,dat.mortar$type,p.adjust.method="BH")
+#########################
+## Compact Letter Display for grouping where no significant differences
+########################
+library(rcompanion)
+cldList(P.adj ~ Comparison,
+        data = DT$res,
+        threshold = 0.05)

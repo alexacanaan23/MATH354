@@ -1,0 +1,13 @@
+\begin{thebibliography}{}
+
+\bibitem[Auguie, 2017]{gridExtra}
+Auguie, B. (2017).
+\newblock {\em gridExtra: Miscellaneous Functions for "Grid" Graphics}.
+\newblock R package version 2.3.
+
+\bibitem[Wickham, 2016]{ggplot2}
+Wickham, H. (2016).
+\newblock {\em ggplot2: Elegant Graphics for Data Analysis}.
+\newblock Springer-Verlag New York.
+
+\end{thebibliography}

@@ -1,0 +1,88 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### T interval
+########################################################################
+alpha<-0.05
+ggdat<-data.frame(x=seq(from=-4,to=4,by=0.01),
+                  f=dt(seq(from=-4,to=4,by=0.01),df=25-1))
+ggdat.highlight<-data.frame(x=qt(p = c(alpha/2,1-alpha/2),df = 25-1),
+                  y=c(0,0))
+ggplot(data=ggdat,aes(x=x,y=f))+
+  geom_line()+
+  geom_ribbon(data=subset(ggdat,x<=qt(alpha/2,df=25-1)),aes(ymax=f),ymin=0,
+              fill="grey",colour=NA,alpha=0.5)+ #note alpha here refers to color transparancy
+  geom_ribbon(data=subset(ggdat,x>=qt(1-alpha/2,df=25-1)),aes(ymax=f),ymin=0,
+              fill="grey",colour=NA,alpha=0.5)+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y))+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab("t")+
+  ylab("Density")+
+  annotate("text", x=-3, y=0.05, label= deparse(bquote(alpha/2)),parse=T,size=3.5)+ #deparse keeps bquote a string which is processed later
+  annotate("text", x=3, y=0.05, label= deparse(bquote(alpha/2)),parse=T,size=3.5)+
+  annotate("text", x=0, y=0.2, label= deparse(bquote(1-alpha)),parse=T,size=3.5)
+  
+qt(1-alpha/2,25-1) ## upper 0.025 quantile
+qt(alpha/2,25-1) ## lower 0.025 quantile
+
+########################################################################
+#### Cadmium T interval
+########################################################################
+data.cadmium<-c(0.044,0.030,0.052,0.044,0.046,0.020,0.066,
+                0.052,0.049,0.030,0.040,0.045,0.039,0.039,
+                0.039,0.057,0.050,0.056,0.061,0.042,0.055,
+                0.037,0.062,0.062,0.070,0.061,0.061,0.058,
+                0.053,0.060,0.047,0.051,0.054,0.042,0.051)
+mean(data.cadmium)
+sd(data.cadmium)
+
+alpha<-0.01
+qt(1-alpha/2,35-1)
+
+mean(data.cadmium)+c(-1,1)*(sd(data.cadmium)/sqrt(35))*qt(1-alpha/2,35-1)
+
+t.test(x=data.cadmium,conf.level=0.99)
+
+########################################################################
+#### Cadmium T interval plot
+########################################################################
+ggdat<-data.frame(cadmium=data.cadmium)
+g1<-ggplot(data=ggdat,aes(x=cadmium))+
+  geom_histogram(aes(y = ..density..),
+                 binwidth=density(ggdat$cadmium)$bw,
+                 fill="lightblue",color="black")+
+  geom_density(color="red")+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab(bquote("Level of Cadmium (mg"/m^3*")"))+
+  ylab("Density")
+
+length(data.cadmium) #gives n
+alpha<-0.01 #significance level
+ggdat<-data.frame(t=seq(from=-4,to=4,by=0.01),
+                  f=dt(seq(from=-4,to=4,by=0.01),df=35-1))
+#plot a point at the 0.005 and 0.995 quantiles
+ggdat.highlight<-data.frame(x=qt(p = c(alpha/2,1-alpha/2),df = 35-1),
+                            y=c(0,0))
+#Save the cadmium levels corresponding to t=-4,-3,...,3,4
+axis.labels<-round(c(qt(alpha/2,35-1),0,qt(1-alpha/2,35-1))*
+                     (sd(data.cadmium)/sqrt(35)) + mean(data.cadmium),3)
+g2<-ggplot(data=ggdat,aes(x=t,y=f))+
+  geom_line()+
+  geom_ribbon(data=subset(ggdat,t<=qt(alpha/2,df=35-1)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+ 
+  geom_ribbon(data=subset(ggdat,t>=qt(1-alpha/2,df=35-1)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y))+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab("t")+
+  ylab("Density")+
+  annotate("text", x=-3.1, y=0.05, label= deparse(bquote(alpha/2==0.005)),parse=T,size=3.5)+ 
+  annotate("text", x=3.1, y=0.05, label= deparse(bquote(alpha/2==0.005)),parse=T,size=3.5)+
+  annotate("text", x=0, y=0.2, label= deparse(bquote(1-alpha==0.99)),parse=T,size=3.5)+
+  scale_x_continuous(sec.axis = sec_axis(~., breaks=c(qt(alpha/2,35-1),0,qt(1-alpha/2,35-1)),
+                                         labels = axis.labels,name=bquote("Level of Cadmium (mg"/m^3*")")))  
+
+grid.arrange(g1,g2,ncol=2)

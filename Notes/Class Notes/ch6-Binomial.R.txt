@@ -1,0 +1,192 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### Binomial Distribution
+########################################################################
+dbinom(x=1,prob=0.25,size=10) #P(X=1|n=10,p=0.25)
+pbinom(q=1,prob=0.25,size=10) #P(X<=1|n=10,p=0.25)
+qbinom(p=0.2,prob=0.25,size=10) #The 20th percentile
+rbinom(n=10,prob=0.25,size=10) #A random sample of 10 Xi~Binomial(n=10,p=0.25)
+
+
+ggdat<-data.frame(x=(-1:11),
+                  f1=dbinom(x=(-1:11),size=10,prob=0.10),
+                  F1=pbinom(q=(-1:11),size=10,prob=0.10),
+                  f2=dbinom(x=(-1:11),size=10,prob=0.25),
+                  F2=pbinom(q=(-1:11),size=10,prob=0.25),
+                  f3=dbinom(x=(-1:11),size=10,prob=0.50),
+                  F3=pbinom(q=(-1:11),size=10,prob=0.50),
+                  f4=dbinom(x=(-1:11),size=10,prob=0.75),
+                  F4=pbinom(q=(-1:11),size=10,prob=0.75))
+#####1
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f1), ymin=0)+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlim(0,10)+
+  ylim(0,0.50)+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Binomial PMF",subtitle="n=10, p=0.10")
+
+ggdat.openpoints<-data.frame(x=ggdat$x,
+                             y=pbinom(ggdat$x-1,size=10,prob=0.10))
+ggdat.closedpoints<-data.frame(x=ggdat$x,
+                               y=pbinom(ggdat$x,size=10,prob=0.10))
+g1.CDF<-ggplot(data=ggdat, aes(x = x, y = F1)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Binomial CDF",subtitle="n=10, p=0.10")
+
+#####2
+g2<-ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f2), ymin=0)+
+  geom_hline(yintercept=0)+
+  xlim(0,10)+
+  ylim(0,0.50)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Binomial PMF",subtitle="n=10, p=0.25")
+
+ggdat.openpoints<-data.frame(x=ggdat$x,
+                             y=pbinom(ggdat$x-1,size=10,prob=0.25))
+ggdat.closedpoints<-data.frame(x=ggdat$x,
+                               y=pbinom(ggdat$x,size=10,prob=0.25))
+g2.CDF<-ggplot(data=ggdat, aes(x = x, y = F2)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Binomial CDF",subtitle="n=10, p=0.25")
+
+#####3
+g3<-ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f3), ymin=0)+
+  geom_hline(yintercept=0)+
+  xlim(0,10)+
+  ylim(0,0.50)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Binomial PMF",subtitle="n=10, p=0.50")
+
+ggdat.openpoints<-data.frame(x=ggdat$x,
+                             y=pbinom(ggdat$x-1,size=10,prob=0.50))
+ggdat.closedpoints<-data.frame(x=ggdat$x,
+                               y=pbinom(ggdat$x,size=10,prob=0.50))
+g3.CDF<-ggplot(data=ggdat, aes(x = x, y = F3)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Binomial CDF",subtitle="n=10, p=0.50")
+
+#####4
+g4<-ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=f4), ymin=0)+
+  geom_hline(yintercept=0)+
+  xlim(0,10)+
+  ylim(0,0.50)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Binomial PMF",subtitle="n=10, p=0.75")
+
+ggdat.openpoints<-data.frame(x=ggdat$x,
+                             y=pbinom(ggdat$x-1,size=10,prob=0.75))
+ggdat.closedpoints<-data.frame(x=ggdat$x,
+                               y=pbinom(ggdat$x,size=10,prob=0.75))
+g4.CDF<-ggplot(data=ggdat, aes(x = x, y = F4)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Binomial CDF",subtitle="n=10, p=0.75")
+
+grid.arrange(g1,g1.CDF,
+             g2,g2.CDF,
+             g3,g3.CDF,
+             g4,g4.CDF,ncol=2)
+
+####Example
+dbinom(x=1,size=100,prob=0.05)#P(X=1|n=100,p=0.05)
+
+ggdat<-data.frame(x=(-1:15), #a subset of the range
+                  fx=dbinom(x=(-1:15),size=100,prob=0.05))
+ggdat.highlight<-data.frame(x=1,fx=dbinom(x=1,size=100,prob=0.05))
+
+ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=fx), ymin=0)+
+  geom_linerange(data=ggdat.highlight,aes(x=x,ymax=fx),color="red", ymin=0)+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlim(0,15)+
+  xlab("Defective Items (X)")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Binomial PMF",subtitle = bquote(P(X==1)~"for n=100, p=0.05"))
+
+####Example
+pbinom(q=5,size=100,prob=0.05)#P(X<=5|n=100,p=0.05)
+
+ggdat<-data.frame(x=(-1:15), #a subset of the range
+                  fx=dbinom(x=(-1:15),size=100,prob=0.05),
+                  Fx=pbinom(q=(-1:15),size=100,prob=0.05))
+ggdat.highlight<-data.frame(x=0:5,fx=dbinom(x=0:5,size=100,prob=0.05))
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_linerange(aes(ymax=fx), ymin=0)+
+  geom_linerange(data=ggdat.highlight,aes(x=x,ymax=fx),color="red", ymin=0)+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlim(0,15)+
+  xlab("Defective Items (X)")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Binomial PMF",subtitle = bquote(P(X<=5)~"for n=100, p=0.05"))
+
+ggdat.openpoints<-data.frame(x=ggdat$x,
+                             y=pbinom(ggdat$x-1,size=100,prob=0.05))
+ggdat.closedpoints<-data.frame(x=ggdat$x,
+                               y=pbinom(ggdat$x,size=100,prob=0.05))
+ggdat.highlight<-data.frame(x=5,y=pbinom(5,size=100,prob=0.05))
+g1.CDF<-ggplot(data=ggdat, aes(x = x, y = Fx)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_point(data = ggdat.highlight, aes(x = x, y = y),color="red") +
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("Defective Items (X)")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Binomial CDF",subtitle = bquote(P(X<=5)~"for n=100, p=0.05"))
+grid.arrange(g1,g1.CDF,ncol=2)
+
+
+####Example
+qbinom(p=0.10,size=100,prob=0.05)#The 10th percentile
+pbinom(q=1,size=100,prob=.05)#P(X<=1|n=100,p=0.05)
+pbinom(q=2,size=100,prob=.05)#P(X<=2|n=100,p=0.05)
+
+ggplot(data=ggdat, aes(x = x, y = Fx)) +
+  geom_step()+
+  geom_point(data = ggdat.openpoints, aes(x = x, y = y),shape=1) +
+  geom_point(data = ggdat.closedpoints, aes(x = x, y = y)) +
+  geom_hline(yintercept=0)+
+  geom_hline(yintercept=0.10,color="red",linetype="dashed")+
+  theme_bw()+
+  xlab("Defective Items (X)")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Binomial CDF",subtitle = bquote(F^{-1}*(0.10)==2~"for n=100, p=0.05"))

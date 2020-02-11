@@ -1,0 +1,817 @@
+\documentclass{article}
+\usepackage{amsmath} %This allows me to use the align functionality.
+                     %If you find yourself trying to replicate
+                     %something you found online, ensure you're
+                     %loading the necessary packages!
+\usepackage{amsfonts}%Math font
+\usepackage{graphicx}%For including graphics
+\usepackage{hyperref}%For Hyperlinks
+\usepackage{natbib}        %For the bibliography
+\bibliographystyle{apalike}%For the bibliography
+\usepackage[margin=1.0in]{geometry}
+\usepackage{float}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\SweaveOpts{width=8,height=5}%set the size of the graphs to fit nicely on a 8.5x11 sheet
+\noindent \textbf{MA 354: Data Analysis I -- Fall 2019}\\%\\ gives you a new line
+\noindent \textbf{Homework 0:}\vspace{1em}\\
+\emph{Complete the following opportunities to use what we've talked about in class. 
+These questions will be graded for correctness, communication and succinctness. Ensure
+you show your work and explain your logic in a legible and refined submission. If you
+make a mistake while completing this assignment do not delete it -- instead, make a note
+about why it's a mistake, how you realized it, and how you fixed it. The best, most 
+productive recovery from a mistake will receive a 5 point bonus.}
+%Comments -- anything after % is not put into the PDF
+\begin{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 0
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item[0.] \textbf{Complete weekly diagnostics.} Upon completion of this assignment
+  reflect, in a few sentences, on what you've learned since the beginning of the semester.
+  Think about an mention any concepts you want or need to continue working on and
+  list at least one goal for the next assignment.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item \textbf{Writing Functions and Loops.} Create a function called \texttt{f1} 
+  in \texttt{R}, in as few lines as possible that represents the  following function.
+    \[f_1(x) = \ln\left(\sqrt{x*10^3}\right)\]
+    Compare the runtime of your function to the one below using a loop that saves 
+    the runtime of each function over 1000 iterations. Summarize and compare the results.
+<<>>=
+f2 <- function(x){
+  a<- x*10^3
+  b<- sqrt(a)
+  c<- log(b)
+  return(c)
+}
+f2(1)
+@
+You can track the runtime of code using the following \texttt{R} code.
+<<>>=
+start_time <- Sys.time()
+#do things you want to time here
+end_time <- Sys.time()
+runtime <-end_time - start_time
+@
+You might want to report this runtime in your .pdf document, but you'll find that the 
+runtime changes each time you compile your document. You can pass variable values in \texttt{R}
+to the document using the \texttt{Sexpr} command. For example, the runtime of the comment above
+is \Sexpr{round(runtime,3)} seconds.
+
+\textbf{Solution:}
+<<>>=
+f1 <- function(x){
+  return(log(sqrt(x*10^3))) #originally put ln as a function here whoops
+  }
+
+f2 <- function(x){
+  a<- x*10^3
+  b<- sqrt(a)
+  c<- log(b)
+  return(c)
+}
+
+#test
+#start_time2 <- Sys.time()
+#f2(1)
+#end_time2 <- Sys.time()
+#runtime2 <- end_time1 - start_time2
+#runtime2
+
+#runtime for f1
+r1 <- function(n){
+start_time1 <- Sys.time()
+f1(1)
+end_time1 <- Sys.time()
+runtime1 <-end_time1 - start_time1
+return(runtime1)
+}
+
+#runtime for f2
+r2 <- function(n){
+start_time2 <- Sys.time()
+f2(1)
+end_time2 <- Sys.time()
+runtime2 <-end_time2 - start_time2
+return(runtime2)
+}
+
+#initialize 
+t1 = 0
+t2 = 0
+
+#1000 iterations of runtime
+for (number in 1:1000){
+  t1 = t1 + r1(1)
+  t2 = t2 + r2(1)
+}
+t1 = t1/1000
+t2 = t2/1000
+  
+t1
+t2
+@  
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item \textbf{Conditional Statements and Loops.} Assess which is faster.
+  \begin{enumerate}
+    \item Generate 1000 random integers between 1 and 1000 with replacement with
+    the following \texttt{R} code.
+<<>>=
+random.ints<-sample(x=1:1000,size=1000,replace=TRUE)
+@    
+    Then, using a loop, create a vector named \texttt{random.type} that is ``odd"
+    when the corresponding value in \texttt{random.ints} is odd and ``even" otherwise.
+    \begin{enumerate}
+      \item Add elements to the vector called \texttt{random.type} as they
+      are decided; e.g., for an iteration where the value is odd we add
+      an element using \texttt{random.type<-c(random.type,"odd")}.
+      \item Create an empty vector of size 1000 (with \texttt{NA} entries) to 
+      start and place elements into the vector; e.g., for iteration $i$
+      where the value is odd we place the element using \texttt{random.type[i]}.
+    \end{enumerate}
+    Which is faster?
+\end{enumerate}
+
+\textbf{Solution:}
+<<>>=
+#part i - add elements as they are decided
+random.ints1 <-sample(x=1:1000,size=1000,replace=TRUE)
+start_timei <- Sys.time()
+random.type1 <- c()
+for (i in 1:1000){
+  if (random.ints1[i]%%2 != 0) {
+    random.type1<- c(random.type1,"odd")
+  } else {
+    random.type1<- c(random.type1,"even")
+  }
+}
+end_timei <- Sys.time()
+runtimei <-end_timei - start_timei
+
+#part ii - create a vector and then place elements into vector
+#random.ints<-sample(x=1:1000,size=1000,replace=TRUE)
+start_timeii <- Sys.time()
+random.type = rep(NA, 1000)
+for (i in 1:1000){
+  if (random.ints1[1]%%2 != 0){
+    vec <- c(random.type[i],"odd")
+  } else {
+    vec <- c(random.type[i], "even")
+  }
+}
+end_timeii <- Sys.time()
+runtimeii <-end_timeii - start_timeii
+
+print(runtimei)
+print(runtimeii)
+@
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item \textbf{Conditional Statements and Loops} Each new term in the Fibonacci sequence is 
+  generated by adding the previous two terms. By starting with 1 and 2, the first 
+  10 terms will be 1, 2, 3, 5, 8, 13, 21, 34, 55, 89. Find the sum of the even terms in the 
+  Fibonacci sequence whose values do not exceed one million.
+
+\textbf{Solution:}  
+<<>>=
+num1 = 1
+num2 = 2
+sums = 0
+
+while (num1 <= 1000000 & num2 <= 1000000){
+  newnum = num1 + num2
+  #misunderstood the question here, thought I was trying to add up the sum closest to, but not exceeding one million
+   # if (newnum + sums > 1000000){
+   #   break
+   # }
+   if (newnum%%2==0){ 
+     sums = sums + newnum
+   } 
+   # else {
+   #   print(sums)
+   # }
+   if (num1<num2){
+     num1 = newnum
+   } else {
+     num2 = newnum
+   }
+ }
+ sums
+@
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+  \item  \textbf{Conditional Statements and Loops} A palindromic number reads the same 
+  both ways. The largest palindrome made from the product of two 2-digit numbers is 
+  $9009 = 91 \times 99$. Find the largest palindrome made from the product of two 3-digit numbers.
+  
+  You can get the reverse of a number using the ``stringr" package for \texttt{R}
+  (practice Sweave by putting by the citation here:
+  \cite{R}) as follows.
+ 
+<<>>=
+install.packages("stringr",repos = "https://cloud.r-project.org")
+library(stringr)
+number.to.reverse <- 1234
+#creates a list containing a vector of characters
+(split.number<-str_split(number.to.reverse,pattern=""))
+(split.number<-split.number[[1]]) #takes just the vector
+(split.number.reversed <- rev(split.number)) #reverses the order of the vector
+(reversed.number <- paste(split.number.reversed, collapse="")) #paste items back together
+(reversed.number<-as.numeric(reversed.number)) #treat it like a number
+@
+\textbf{Remark:} You'll find that the solution to this question will elongate the
+compiling time for the .pdf. That's okay. Once you're happy with the solution 
+you can type the output into your code chunk and set eval=FALSE between the left
+and right arrows.
+
+\textbf{Solution:}  
+<<eval=FALSE>>=
+# the way I originally thought of this problem, 
+#I was trying to break out of the nested for loop. 
+#After taking a break and coming back to the problem, 
+#I recognize that if I store the maximum variable 
+#and replace it only when finding a greater palindrome, 
+#I would be able to find the answer. 
+#This takes more time to compile, but does get me the right answer
+install.packages("stringr",repos = "https://cloud.r-project.org")
+library(stringr)
+maxnum = 0
+for (num1 in 999:100){
+  for (num2 in 999:100){
+    pp = num1 * num2
+    split.number<-str_split(pp,pattern="")
+    split.number<-split.number[[1]]
+    split.number.reversed <- rev(split.number) #reverses the order of the vector
+    reversed.number <- paste(split.number.reversed, collapse="")   #paste items back together
+    reversed.number<-as.numeric(reversed.number) #treat it like a number
+    if (pp == reversed.number & pp > maxnum){
+      maxnum = pp
+      }
+  }
+}
+print(maxnum)
+@
+
+<<eval=FALSE>>==
+#other attempt
+install.packages("stringr",repos = "https://cloud.r-project.org")
+library(stringr)
+for (num in 999:100){
+  num1 = 999
+  pp = num1 * num 
+  split.number<-str_split(pp,pattern="")
+  split.number<-split.number[[1]]
+  split.number.reversed <- rev(split.number) #reverses the order of the vector
+  reversed.number <- paste(split.number.reversed, collapse="")   #paste items back together
+  reversed.number<-as.numeric(reversed.number) #treat it like a number
+  if (pp == reversed.number){
+    print(pp)
+    break
+  } else {
+    num1 = num1 - 1
+  }
+}
+@
+
+<<eval=FALSE>>=
+#other attempt
+install.packages("stringr",repos = "https://cloud.r-project.org")
+library(stringr)
+num1 = 999
+num2 = 999
+pp = num1 * num2 
+split.number<-str_split(pp,pattern="")
+split.number<-split.number[[1]]
+split.number.reversed <- rev(split.number) #reverses the order of the vector
+reversed.number <- paste(split.number.reversed, collapse="")   #paste items back together
+reversed.number<-as.numeric(reversed.number) #treat it like a number
+@
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 5
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item \textbf{(Working with Data)} Below you will load and summarize a dataset 
+  containing 575 observations of drug treatments. The data includes the following
+  \begin{itemize}
+    \item ID --	Identification Code	(1 - 575)
+    \item AGE	-- Age at Enrollment	(Years)
+    \item BECK -- Beck Depression Score	(0.000 - 54.000)
+    \item HC --	Heroin/Cocaine Use During	3 Months Prior to Admission (1 = Heroin
+    \& Cocaine; 2 = Heroin Only, 3 = Cocaine Only; 4 = Neither Heroin nor Cocaine)
+    \item IV -- History of IV Drug Use	(1 = Never; 2 = Previous; 3 = Recent)
+    \item IV3	-- Recent IV use	(1 = Yes; 0 = No)
+    \item NDT -- Number of Prior Drug Treatments (0 - 40)
+    \item RACE -- Subject's Race	(0 = White; 1 = Non-White)
+    \item TREAT -- Treatment Randomization (0 = Short Assignment;	1 = Long Assignment)
+    \item SITE -- Treatment Site (0 = A; 1 = B)
+    \item LEN.T	-- Length of Stay in Treatment (Days Admission Date to Exit Date)	
+    \item TIME -- Time to Drug Relapse (Days Measured from Admission Date)
+    \item CENSOR -- Event for Treating Lost to Follow-Up as Returned to Drugs 
+    (1 = Returned to Drugs or Lost to Follow-Up; 0 = Otherwise)
+    \item etc.
+  \end{itemize}
+  \begin{enumerate} %this begins a lettered enumerate so I can ask more 
+                    %than one question in a question.
+    \item Load the data provided in the ``quantreg" package for \texttt{R} \citep{quantreg}.
+<<>>=
+# install.packages("quantreg",repos = "http://cloud.r-project.org/")
+# library("quantreg")
+# data("uis")
+@
+
+    \item Numerically summarize the Beck Depression Score of the observed drug 
+    treatment patients. Note the following designations of the test when interpreting
+    your results.
+    \begin{itemize}
+      \item 0-13: minimal depression
+      \item 14-19: mild depression
+      \item 20-28: moderate depression
+      \item 29-63: severe depression.
+    \end{itemize}
+    \item Graphically summarize the Beck Depression Score of the
+    observed drug treatment patients. Interpret the results through 
+    the lens of the scale above.
+    \item List three questions about drug use that we might be able to answer based on the 
+    data we have.
+  \end{enumerate}
+\textbf{Solution:}
+<<>>=
+#PART A: Load the data
+install.packages("quantreg",repos = "http://cloud.r-project.org/")
+library("quantreg")
+data("uis")
+
+#PART B: Summarize the data
+summary(uis$BECK)
+
+#create counts of designations of depression
+uis["depression.severity"]<-NA
+
+for (i in 1:575) {
+  if (uis$BECK[i] >= 0 & uis$BECK[i] <= 13) {
+    uis$depression.severity[i] = "minimal"
+  } else if (uis$BECK[i] > 13 & uis$BECK[i] <= 19) {
+    uis$depression.severity[i] = "mild"
+  } else if (uis$BECK[i] > 19 & uis$BECK[i] <= 28) {
+    uis$depression.severity[i] = "moderate"
+  } else if (uis$BECK[i] > 28 & uis$BECK[i] <= 63) {
+    uis$depression.severity[i] = "severe"
+  }
+}
+@
+
+<<fig=TRUE, echo=FALSE>>=  
+barplot(table(uis$depression.severity),
+        main = "Summary of Beck Depression Scores by Severity",
+        xlab = "Beck Depression Scores",
+        ylab = "Count",
+        col = "purple")
+abline(h=0)
+@
+
+<<>>=
+#PART C: Graphically summarize the BDS
+#install.packages("ggplot2")
+library(ggplot2)
+#install.packages("graphics")
+library(graphics)
+library(gridExtra)
+
+@    
+
+<<fig=TRUE, echo=FALSE>>=
+boxplot(uis$BECK,
+        main='Summary of Beck Depression Scores',
+        xlab="", ylab='Scores',
+        col='lightblue')
+@
+
+<<fig=TRUE, echo=FALSE>>=  
+hist(prop.table(table(uis$BECK)),
+        main = "Frequencies of Beck Depression Scores",
+        xlab = "Beck Depression Scores",
+        ylab = "Density",
+        col = "purple",
+        #breaks=seq(0,2,1),
+        probability=TRUE) #probability density, not frequency
+lines(density(uis$BECK),col="green",lwd=2)
+abline(h=0)
+@
+
+
+<<>>=
+#Plot2
+# dataframe2<-data.frame(prop.table(table(uis$BECK)))
+# p2<-ggplot(data=dataframe2, aes(x="Var1", y="Freq")) +
+#   geom_bar(stat= "identity",
+#            color= "black",
+#            fill= "lightblue") +
+#   xlab("Beck Depression Score") +
+#   ylab("Proportion") +
+#   ggtitle("Relative Frequencies of Beck Depression Scores of Drug Treatment Patients") +
+#   geom_hline(yintercept=0)
+#   theme_bw()
+# p2
+@
+
+<<>>=
+#Questions to consider, given the data
+#1. Does age of enrollment of the patient have an effect on time to drug relapse? (regression)
+#2. Does time to drug relapse vary by treatment randomization?
+#3. Is time to drug relapse correlated with the use or non-use of herion and/or cocaine during the 3 months prior to Admission?
+@ 
+
+<<>>=
+# par(mfrow=c(1,2)) #graphics settings 1 row, 2 columns of plots
+# #Frequency barplot
+# barplot(table(uis$BECK),
+#   main="Frequencies of Beck Depression Scores of Drug Treatment Patients",
+#   xlab="Beck Depression Scores", 
+#   ylab="Frequency",
+#   col="lightblue")
+#   abline(h=0)
+# 
+# #Relative Frequency Bar Plot
+# barplot(prop.table(table(uis$depressionlevel)),
+#   main="Frequencies of Beck Depression Scores of Drug Treatment Patients",
+#   xlab="Beck Depression Scores", ylab="Relative Frequency",
+#   col="lightblue")
+#   abline(h=0)
+#   
+# boxplot(uis$BECK)
+#   main="Beck Depression Scores"
+#   xlab=""
+#   ylab="Frequency"
+@
+  
+<<>>=
+#my computer was getting mad when compiling the PDF
+#and I used ggplot, so I decided to make normal plots instead :(
+# <<p1,fig=TRUE,eval=TRUE>>=
+# #Plot1
+# dataframe<-data.frame(table(uis$BECK))
+# colnames(dataframe)=c("BDS","Freq")
+# p1<-ggplot(dataframe, aes(x=BDS, y=Freq)) +
+#   geom_boxplot(fill="lightblue") +
+#   xlab("Beck Depression Score") +
+#   ylab("Count") +
+#   ggtitle("Frequencies of Beck Depression Scores of Drug Treatment Patients") +
+#   theme_bw()
+# p1
+# @
+# \begin{figure}[H]
+# \centering 
+# <<p1,echo=FALSE>>=
+# @
+# \caption{hi}
+# \end{figure}
+
+@
+
+<<>>=
+#Frequency barplot
+# barplot(table(uis$BECK),
+#   main="Frequencies of Beck Depression Scores of Drug Treatment Patients",
+#   xlab="Beck Depression Scores", 
+#   ylab="Frequency",
+#   col="lightblue")
+#   abline(h=0)
+@
+
+\newpage
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%  Question 6
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \item \textbf{(Working with Data)} Hepatitis C is a disease 
+    that affects the liver. The virus that causes hepatitis C 
+    is spread through blood or bodily fluids of an infected person. 
+    The virus is often difficult to diagnose because there are few unique 
+    symptoms. Those infected, however, sometimes experience jaundice -- a 
+    condition that causes yellowing of the skin or eyes, as the liver 
+    is infected.
+
+    \cite{Bracht16} consider the human microfibrillar-associated protein 4,
+    or MFAP4, and its role in disease-related tissue. Stage 0--no fibrosis; 
+    Stage 1--enlarged, fibrotic portal tracts; Stage 2--periportal fibrosis 
+    or portal-portal septa, but intact architecture; Stage 3--fibrosis with
+    architectural distortion, but no obvious cirrhosis; and Stage 4--probable
+    or definite cirrhosis.
+
+    Previously, it has been shown that MFAP4 is a biomarker candidate for hepatic
+    fibrosis and cirrhosis in hepatitis C patients. The analysis of \cite{Bracht16}
+    aimed to consider the ability of MFAP4 to differentiate between stages of the 
+    disease -- fibrosis stages (0-2) and cirrhosis (3-4) based on the Scheuer 
+    scoring system.
+    
+    Below, I load the data and calculate the age of patients using the ``lubridate"
+    package for \texttt{R} \citep{lubridate}.
+<<>>=
+fn<-"http://cipolli.com/students/data/biomarker.csv"
+dat <- read.csv(file=fn, header=TRUE, sep=",")
+head(dat)
+###Calculate the age of each subject
+install.packages("lubridate",repos = "http://cloud.r-project.org/")
+library(lubridate)
+###Create Date Variable for Date Sampled
+dos<-mdy(dat$Date.of.sampling)
+dos.year<-year(dos)
+###Create age Variable
+age <- dos.year - dat$Year.of.Birth
+###Add age to original dataset
+dat<-data.frame(dat,age)
+@
+  \begin{enumerate}
+  \item Recreate Table 1 in \href{the paper}{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4932744/}. 
+  Add a row to this table labeled ``Median age IQR." I've provided the LaTeX code for the
+  table and made the first entry so you can see how it works.
+
+\begin{table}[H]
+  \centering
+    \begin{tabular}{lccccccc}\hline
+    Fibrosis Stage    & F0 & F1 & F2 & F3 & F4 & All\\\hline\hline
+    \textbf{Age}                &&&&&&\\
+    Mean age SD        &$43.75 \pm 12.11$ & $44.83 \pm 12.64$ & $51.24 \pm 12.04$  & $57.10 \pm 10.4$
+                                & $57.33 \pm 11.31$        
+                                &  $49.3 \pm 13.08$      \\
+    Median age IQR     &  $45(16)$      &  $46(17.5)$       & $51(19)$
+                                &  $57 (14.5)$      & $56(16.5)$
+                                &  $49(18)$      \\
+    \textbf{Gender}             &&&&&&\\
+    Women              &  $52$     & $85$       & $66$
+                                &  $36$      & $28$
+                                &  $267$      \\
+    Men                &  $45$      & $91$       & $69$
+                                &  $31$      & $39$
+                                &  $275$      \\
+    Number of patients &  $97$      &  $176$      & $135$
+                                & $67$       & $67$
+                                & $542$       \\
+    \textbf{HCV genotype}       &&&&&&\\
+    1                  &  $70$      & $126$       & $100$
+                                &  $50$      & $43$
+                                &  $389$     \\
+    2                  &  $2$      & $12$       & $1$
+                                &  $1$      & $3$
+                                &  $19$      \\
+    3                  &  $11$      & $25$       & $12$
+                                &  $5$      & $7$
+                                &  $60$      \\
+    4                  &  $0$      &  $4$      & $4$
+                                &  $1$      & $0$
+                                &  $9$      \\
+    Other              &  $0$      & $1$       & $0$
+                                & $0$       & $0$
+                                &  $1$      \\
+    NA                 &  $14$      & $8$       & $18$
+                                &  $10$      & $14$
+                                &  $64$      \\\hline
+    \end{tabular}
+    \caption{Patient cohorts characteristics, subdivided by fibrosis stage}
+  \end{table}
+  \item Create several graphs that may be helpful for the researchers.
+  \end{enumerate}
+\end{enumerate}
+\textbf{Solution:}
+<<>>=
+
+#FIND VALUES FOR TABLE
+#installed dplyr: data manipulation package
+#install.packages("dplyr")
+library(dplyr)
+#all
+meanage_all= mean(dat$age)
+sdage_all= sd(dat$age)
+sdage_all
+medianage_all= median(dat$age)
+medianIQRage_all= IQR(dat$age)
+medianIQRage_all
+summary(dat) #counts for the all column in the table for gender
+#female: 267
+#male: 275
+#number of patients: 542
+#HCV 1: 389
+#HCV 2: 19
+#HCV 3: 60
+#HCV 4: 9
+#HCV Other(andere for the dutch): 1
+#HCV NA: 64
+
+dat.fil0=filter(dat, Fibrosis.Stage==0) #captioned out because compiler got confused by object 'Fibrosis.Stage'
+summary(dat.fil0)
+#meanage0: 43.75
+#sdage0: FIND
+sdage0= sd(dat.fil0$age)
+sdage0
+#medianage0: 45
+#IQRage0: FIND
+IQRage0= IQR(dat.fil0$age)
+IQRage0
+#female: 52
+#male: 45
+#number of patients: 97
+#HCV 1: 70
+#HCV 2: 2
+#HCV 3: 11
+#HCV 4: 0 
+#HCV Other: 0
+#HCV NA: 14
+
+dat.fil1=filter(dat, Fibrosis.Stage==1)
+summary(dat.fil1)
+sdage1= sd(dat.fil1$age)
+sdage1
+IQRage1= IQR(dat.fil1$age)
+IQRage1
+#meanage1: 44.83
+#sdage1: FIND
+#medianage1: 46
+#IQRage1: FIND
+#female: 85
+#male: 91
+#number of patients:176
+#HCV 1: 126
+#HCV 2: 12
+#HCV 3: 25
+#HCV 4: 4
+#HCV Other: 1
+#HCV NA: 8
+
+dat.fil2=filter(dat, Fibrosis.Stage==2)
+summary(dat.fil2)
+sdage2= sd(dat.fil2$age)
+sdage2
+IQRage2= IQR(dat.fil2$age)
+IQRage2
+#meanage2: 51.24
+#sdage2: FIND
+#medianage2: 51.00
+#IQRage2: FIND
+#female: 66
+#male 69:
+#number of patients: 135
+#HCV 1: 100
+#HCV 2: 1
+#HCV 3: 12
+#HCV 4: 4
+#HCV Other: 0
+#HCV NA: 18
+
+dat.fil3=filter(dat, Fibrosis.Stage==3)
+summary(dat.fil3)
+sdage3= sd(dat.fil3$age)
+sdage3
+IQRage3= IQR(dat.fil3$age)
+IQRage3
+#meanage3: 57.1
+#sdage3: find
+#medianage3: 57
+#IQRage3: find
+#female: 36
+#male: 31
+#number of patients: 67
+#HCV 1: 50
+#HCV 2: 1
+#HCV 3: 5
+#HCV 4: 1
+#HCV Other: 0
+#HCV NA 10
+
+dat.fil4=filter(dat, Fibrosis.Stage==4)
+summary(dat.fil4)
+sdage4= sd(dat.fil4$age)
+sdage4
+IQRage4= IQR(dat.fil4$age)
+IQRage4
+#meanage4: 57.33
+#sdage4: find
+#medianage4: 56
+#IQRage4: find
+#female: 28
+#male: 39
+#number of patients: 67
+#HCV 1: 43
+#HCV 2: 3
+#HCV 3: 7
+#HCV 4: 0 
+#HCV Other: 0
+#HCV NA: 14
+@
+
+<<>>=
+#GRAPHS
+@
+
+<<fig=TRUE, echo=FALSE>>=  
+barplot(table(dat.fil0$HCV.Genotype),
+        main = "HCV Genotypes for Fibrosis Stage 0 Patients",
+        xlab = "HCV Genotypes",
+        ylab = "Count",
+        col = "purple")
+abline(h=0)
+@
+
+<<fig=TRUE, echo=FALSE>>=  
+barplot(table(dat.fil1$HCV.Genotype),
+        main = "HCV Genotypes for Fibrosis Stage 1 Patients",
+        xlab = "HCV Genotypes",
+        ylab = "Count",
+        col = "purple")
+abline(h=0)
+@
+
+<<fig=TRUE, echo=FALSE>>=  
+barplot(table(dat.fil2$HCV.Genotype),
+        main = "HCV Genotypes for Fibrosis Stage 2 Patients",
+        xlab = "HCV Genotypes",
+        ylab = "Count",
+        col = "purple")
+abline(h=0)
+@
+
+<<fig=TRUE, echo=FALSE>>=  
+barplot(table(dat.fil3$HCV.Genotype),
+        main = "HCV Genotypes for Fibrosis Stage 3 Patients",
+        xlab = "HCV Genotypes",
+        ylab = "Count",
+        col = "purple")
+abline(h=0)
+@
+
+<<fig=TRUE, echo=FALSE>>=  
+barplot(table(dat.fil4$HCV.Genotype),
+        main = "HCV Genotypes for Fibrosis Stage 4 Patients",
+        xlab = "HCV Genotypes",
+        ylab = "Count",
+        col = "purple")
+abline(h=0)
+@
+
+<<fig=TRUE, echo=FALSE>>=  
+barplot(table(dat.fil0$Gender),
+        main = "Gender of Fibrosis Stage 0 Patients",
+        xlab = "Gender",
+        ylab = "Count",
+        col = "purple")
+abline(h=0)
+@
+
+<<fig=TRUE, echo=FALSE>>=  
+barplot(table(dat.fil1$Gender),
+        main = "Gender of Fibrosis Stage 1 Patients",
+        xlab = "Gender",
+        ylab = "Count",
+        col = "purple")
+abline(h=0)
+@
+
+<<fig=TRUE, echo=FALSE>>=  
+barplot(table(dat.fil2$Gender),
+        main = "Gender of Fibrosis Stage 2 Patients",
+        xlab = "Gender",
+        ylab = "Count",
+        col = "purple")
+abline(h=0)
+@
+
+<<fig=TRUE, echo=FALSE>>=  
+barplot(table(dat.fil3$Gender),
+        main = "Gender of Fibrosis Stage 3 Patients",
+        xlab = "Gender",
+        ylab = "Count",
+        col = "purple")
+abline(h=0)
+@
+
+<<fig=TRUE, echo=FALSE>>=  
+barplot(table(dat.fil4$Gender),
+        main = "Gender of Fibrosis Stage 4 Patients",
+        xlab = "Gender",
+        ylab = "Count",
+        col = "purple")
+abline(h=0)
+@
+\newpage
+\bibliography{bib}
+\end{document}

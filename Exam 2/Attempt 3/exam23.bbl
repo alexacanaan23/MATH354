@@ -1,0 +1,31 @@
+\begin{thebibliography}{}
+
+\bibitem[Almeida et~al., 2017]{qqplotr}
+Almeida, A., Loy, A., and Hofmann, H. (2017).
+\newblock {\em qqplotr: Quantile-Quantile Plot Extensions for 'ggplot2'}.
+\newblock R package version 0.0.3 initially funded by Google Summer of Code
+  2017.
+
+\bibitem[Auguie, 2017]{gridExtra}
+Auguie, B. (2017).
+\newblock {\em gridExtra: Miscellaneous Functions for "Grid" Graphics}.
+\newblock R package version 2.3.
+
+\bibitem[Hervé, 2019]{RVAideMemoire}
+Hervé, M. (2019).
+\newblock {\em RVAideMemoire: Testing and Plotting Procedures for
+  Biostatistics}.
+\newblock R package version 0.9-73.
+
+\bibitem[Mangiafico, 2019]{rcompanion}
+Mangiafico, S. (2019).
+\newblock {\em rcompanion: Functions to Support Extension Education Program
+  Evaluation}.
+\newblock R package version 2.3.7.
+
+\bibitem[Wickham, 2016]{ggplot2}
+Wickham, H. (2016).
+\newblock {\em ggplot2: Elegant Graphics for Data Analysis}.
+\newblock Springer-Verlag New York.
+
+\end{thebibliography}

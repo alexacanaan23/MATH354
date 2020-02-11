@@ -1,0 +1,57 @@
+library(extraDistr)
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### Poisson Distribution
+########################################################################
+#P(X1=4,X2=5,X3=1|p1=0.25,p2=0.625,p3=0.125)
+dmnom(x=c(4,5,1),size =10,pr=c(0.25,0.625,0.125))
+#A random sample of 5 multinomial observations (rows)
+rmnom(n=5,size =10,pr=c(0.25,0.625,0.125))
+
+y1<-seq(0,10,1)
+y2<-seq(0,10,1)
+Y<-expand.grid(y1,y2) #all combinations of (y1,y2)
+colnames(Y)<-c("y1","y2")
+ggdat<-data.frame(y1=Y$y1,
+                  y2=Y$y2,
+                  fxy=dmnom(cbind(Y$y1,Y$y2),size=10,prob=c(0.25,0.75)))
+ggplot(data=ggdat,aes(x=y1,y=y2,fill=fxy))+
+  geom_tile()+
+  scale_fill_gradient2(low = "magenta", high = "cyan", mid = "white",
+                       midpoint = 0.15, limit = c(0,0.30),
+                       name="Probability")+
+  geom_text(aes(label=round(fxy,2)),size=3)+
+  theme_bw()+
+  xlab(bquote(Y[1]))+
+  ylab(bquote(Y[2]))
+
+###########################################################################
+ggdat<-data.frame(x=0:10,
+                  f1=dbinom(0:10,size=10,prob=0.25))
+g1<-ggplot(data=ggdat,aes(x=x,y=f1))+
+  geom_linerange(aes(ymax=f1), ymin=0)+
+  geom_hline(yintercept=0)+
+  ylim(0,0.35)+
+  theme_bw()+
+  xlab(bquote(Y[1]))+
+  ylab(bquote(f[Y[1]](y)))+
+  ggtitle("Binomial PMF",subtitle="p=0.25")+
+  geom_text(aes(label=round(f1,2)),vjust=-0.50,size=3)
+
+ggdat<-data.frame(x=0:10,
+                  f1=dbinom(0:10,size=10,prob=0.75))
+g2<-ggplot(data=ggdat,aes(x=x,y=f1))+
+  geom_linerange(aes(ymax=f1), ymin=0)+
+  geom_hline(yintercept=0)+
+  ylim(0,0.35)+
+  theme_bw()+
+  xlab(bquote(Y[1]))+
+  ylab(bquote(f[Y[1]](y)))+
+  ggtitle("Binomial PMF",subtitle="p=0.75")+
+  geom_text(aes(label=round(f1,2)),vjust=-0.50,size=3)
+
+grid.arrange(g1,g2,ncol=2)
+
+####Example
+dmnom(x=c(88,10,1,1),size=100,pr=c(0.90,0.07,0.02,0.01))

@@ -1,0 +1,139 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### Load City population data
+########################################################################
+library("boot")
+data(city)
+citydat<-city$u ##save data to an object
+citydat
+
+median(citydat)
+
+#Resampling
+sample(x=citydat,size=10,replace=TRUE)
+sample(x=citydat,size=10,replace=TRUE)
+sample(x=citydat,size=10,replace=TRUE)
+sample(x=citydat,size=10,replace=TRUE)
+sample(x=citydat,size=10,replace=TRUE)
+
+
+########################################################################
+#### Bootstrapping population interval
+########################################################################
+alpha<-0.05
+M<-median(citydat)
+R<-1000 #1000 bootstrap samples
+city.boot = c()
+for(i in 1:R){
+ city.boot<-c(city.boot,median(sample(x = citydat, size=10,replace = TRUE)))
+}
+quantile(x=city.boot,probs=alpha/2)
+quantile(x=city.boot,probs=1-alpha/2)
+
+
+boot.median<-function(data,indices){
+  d<-data[indices]  # allows boot to select sample
+  return(median(d))
+}
+cityboot<-boot(citydat,R=1000,statistic=boot.median)
+boot.ci(boot.out=cityboot,conf=0.95,type="perc")
+
+########################################################################
+#### Bootstrapping population interval plot
+########################################################################
+ggdat<-data.frame(population=citydat)
+g1<-ggplot(data=ggdat,aes(x=population))+
+  geom_histogram(aes(y = ..density..), #plots the density
+                 binwidth=density(ggdat$population)$bw, #sets bin width
+                 fill = "lightblue", color="black")+   #color the histogram
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab("City Population (in 1000's)")+
+  ylab("Density")+
+  xlim(-40,200)
+
+ggdat<-data.frame(m.hats=cityboot$t)
+lower<-boot.ci(boot.out=cityboot,conf=0.95,type="perc")$percent[4]
+upper<-boot.ci(boot.out=cityboot,conf=0.95,type="perc")$percent[5]
+#Start plot
+p<-ggplot(data=ggdat,aes(x=m.hats))+
+  geom_density(color="black")
+#Grab density data from the ggplot
+d <- data.frame(x=ggplot_build(p)$data[[1]]$x,
+                f=ggplot_build(p)$data[[1]]$density)
+#Finish plot
+g2<-ggplot(data=d,aes(x=x,y=f))+
+  geom_line(color="black")+ 
+  geom_ribbon(data=subset(d,x<lower),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+
+  geom_ribbon(data=subset(d,x>upper),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab(bquote("Median City Population"~(hat(m))))+
+  ylab("Density")+
+  xlim(-40,200)+
+  annotate("text", x=-15,y=0.002,label= deparse(bquote(alpha/2==0.025)),parse=TRUE,size=3.5)+ 
+  annotate("text", x=155,y=0.002,label= deparse(bquote(alpha/2==0.025)),parse=TRUE,size=3.5)+
+  annotate("text", x=52,y=0.003,label= deparse(bquote(1-alpha==0.95)),parse=TRUE,size=3.5)
+grid.arrange(g1,g2,ncol=2)
+
+
+########################################################################
+#### Bootstrapping arsenic interval
+########################################################################
+data.arsenic<-c(17.6,10.4,13.5,4,19.9,16,12,12.2,11.4,12.7,3,10.3,21.4,
+                19.4,9,6.5,10.1,8.7,9.7,6.4,9.7,63,15.5,10.7,18.2,7.5,
+                6.1,6.7,6.9,0.8,73.5,12,28,12.6,9.4,6.2,15.3,7.3,10.7,
+                15.9,5.8,1,8.6,1.3,13.7,2.8,2.4,1.4,2.9,13.1,15.3,9.2,
+                11.7,4.5,1,1.2,0.8,1,2.4,4.4,2.2,2.9,3.6,2.5,1.8,5.9,2.8,
+                1.7,4.6,5.4,3,3.1,1.3,2.6,1.4,2.3,1,5.4,1.8,2.6,3.4,1.4,
+                10.7,18.2,7.7,6.5,12.2,10.1,6.4,10.7,6.1,0.8,12,28.1,9.4,
+                6.2,7.3,9.7,62.1,15.5,6.4,9.5)
+R<-1000
+boot.median<-function(data,indices){
+  d<-data[indices]  # allows boot to select sample
+  return(median(d))
+}
+arsenicboot<-boot(data.arsenic,R=R,statistic=boot.median)
+boot.ci(boot.out=arsenicboot,conf=0.95,type="perc")
+########################################################################
+#### Bootstrapping arsenic plot
+########################################################################
+ggdat<-data.frame(arsenic=data.arsenic)
+g1<-ggplot(data=ggdat,aes(x=arsenic))+
+  geom_histogram(aes(y = ..density..), #plots the density
+                 binwidth=density(ggdat$arsenic)$bw, #sets bin width
+                 fill = "lightblue", color="black")+   #color the histogram
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab("Arsenic Concentration (ppb)")+
+  ylab("Density")
+
+ggdat<-data.frame(m.hats=arsenicboot$t)
+lower<-boot.ci(boot.out=arsenicboot,conf=0.95,type="perc")$percent[4]
+upper<-boot.ci(boot.out=arsenicboot,conf=0.95,type="perc")$percent[5]
+#Start plot
+p<-ggplot(data=ggdat,aes(x=m.hats))+
+  geom_density(color="black")
+#Grab density data from the ggplot
+d <- data.frame(x=ggplot_build(p)$data[[1]]$x,
+                f=ggplot_build(p)$data[[1]]$density)
+#Finish plot
+g2<-ggplot(data=d,aes(x=x,y=f))+
+  geom_line(color="black")+ 
+  geom_ribbon(data=subset(d,x<lower),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+
+  geom_ribbon(data=subset(d,x>upper),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab(bquote("Median City Population"~(hat(m))))+
+  ylab("Density")+
+  xlim(0,15)+
+  annotate("text", x=3.5,y=0.025,label= deparse(bquote(alpha/2==0.025)),parse=TRUE,size=3.5)+ 
+  annotate("text", x=12.5,y=0.025,label= deparse(bquote(alpha/2==0.025)),parse=TRUE,size=3.5)+
+  annotate("text", x=7.75,y=0.075,label= deparse(bquote(1-alpha==0.95)),parse=TRUE,size=3.5)
+
+grid.arrange(g1,g2,ncol=2)

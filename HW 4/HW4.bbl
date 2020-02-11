@@ -1,0 +1,17 @@
+\begin{thebibliography}{}
+
+\bibitem[Bracht et~al., 2016]{Bracht16}
+Bracht, T., Molleken, C., Ahrens, M., Poschmann, G., Schlosser, A., Eisenacher,
+  M., Stuhler, K., Meyer, H.~E., Schmiegel, W.~H., Holmskov, U., Sorensen,
+  G.~L., and Sitek, B. (2016).
+\newblock Evaluation of the biomarker candidate mfap4 for non-invasive
+  assessment of hepatic fibrosis in hepatitis {C} patients.
+\newblock {\em Journal of Translational Medicine}, 14.
+
+\bibitem[Venables and Ripley, 2002]{MASS}
+Venables, W.~N. and Ripley, B.~D. (2002).
+\newblock {\em Modern Applied Statistics with S}.
+\newblock Springer, New York, fourth edition.
+\newblock ISBN 0-387-95457-0.
+
+\end{thebibliography}

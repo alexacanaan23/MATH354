@@ -1,0 +1,481 @@
+\documentclass{article}
+\usepackage{amsmath} %This allows me to use the align functionality.
+                   %If you find yourself trying to replicate
+                   %something you found online, ensure you're
+                   %loading the necessary packages!
+\usepackage{amsfonts}%Math font
+\usepackage{graphicx}%For including graphics
+\usepackage{hyperref}%For Hyperlinks
+\usepackage{natbib}        %For the bibliography
+\bibliographystyle{apalike}%For the bibliography
+\usepackage[margin=1.0in]{geometry}
+\usepackage{float}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\SweaveOpts{width=8,height=5}%set the size of the graphs to fit nicely on a 8.5x11 sheet
+\noindent \textbf{MA 354: Data Analysis I -- Fall 2019}\\%\\ gives you a new line
+\noindent \textbf{Homework 3:}\vspace{1em}\\
+\emph{Complete the following opportunities to use what we've talked about in class. 
+These questions will be graded for correctness, communication and succinctness. Ensure
+you show your work and explain your logic in a legible and refined submission.}\\
+%Comments -- anything after % is not put into the PDF
+
+\begin{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 0
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item[0.] \textbf{Complete weekly diagnostics.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item  	Plankton samples are typically collected using fine mesh nets towed from research vessels, and larval fish are removed then stored after sample preservation. Samples are frequently collected using the paired bongo net, which consists of two usually round net frames joined at a central point, and towed either obliquely or vertically through the water column. Mesopelagic fish families such as the Myctophidae are some of the most specious and abundant in the worlds oceans. We expect the number of Myctophidae in the left and right side of each net to be highly correlated, but we want to quantify this relationship. 
+	
+	\cite{Muhling} provide data on a total of 261 paired samples from the Gulf of Mexico. Myctophidae counts from the left and right sides of each bongo net are a result of over years (1987-2008) of sampling. We define $X$ and $Y$ to be the count of myctophid larvae in the left and right side of the bongo net, respectively.
+	
+\textbf{Research Question:} Does the data we have confirm our expectation that the number of Myctophidae in the left and right side of each net tend to be highly correlated? 
+
+The data can be loaded as follows. The data for the number of fish caught in the left and
+right net are in the columns labeled \texttt{Left} and \texttt{Right}, respectively.
+<<>>=
+dat.bongo<-read.csv(file = "https://cipolli.com/students/data/BongoNetData.txt",
+                      header = TRUE,sep = ",")
+
+@
+
+<<>>=
+summary(dat.bongo$Left)
+summary(dat.bongo$Right)
+@
+
+<<fig=TRUE>>=
+library(ggplot2)
+library(gridExtra)
+ggdat<-data.frame(left=dat.bongo$Left, right=dat.bongo$Right)
+ggplot(data=ggdat,aes(x = right, y= left))+
+  geom_point()+
+  geom_smooth(alpha=0.25,color="black",method="loess")+
+  theme_bw()+
+  ggtitle("Left and Right Sides of a Bongo Net")
+@
+
+<<>>=
+cor(dat.bongo$Left,dat.bongo$Right,method = "pearson")
+cor(dat.bongo$Left,dat.bongo$Right,method = "kendall")
+cor(dat.bongo$Left,dat.bongo$Right,method = "spearman")
+@
+
+**Would we want to use a kendall or a spearman's rank because the graph shows that the correlation isn't totally linear?
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{(Working with Data)} Hepatitis C is a disease 
+    that affects the liver. The virus that causes hepatitis C 
+    is spread through blood or bodily fluids of an infected person. 
+    The virus is often difficult to diagnose because there are few unique 
+    symptoms. Those infected, however, sometimes experience jaundice -- a 
+    condition that causes yellowing of the skin or eyes, as the liver 
+    is infected.
+
+    \cite{Bracht16} consider the human microfibrillar-associated protein 4,
+    or MFAP4, and its role in disease-related tissue. Stage 0--no fibrosis; 
+    Stage 1--enlarged, fibrotic portal tracts; Stage 2--periportal fibrosis 
+    or portal-portal septa, but intact architecture; Stage 3--fibrosis with
+    architectural distortion, but no obvious cirrhosis; and Stage 4--probable
+    or definite cirrhosis.
+
+    Previously, it has been shown that MFAP4 is a biomarker candidate for hepatic
+    fibrosis and cirrhosis in hepatitis C patients. The analysis of \cite{Bracht16}
+    aimed to consider the ability of MFAP4 to differentiate between stages of the 
+    disease -- fibrosis stages (0-2) and cirrhosis (3-4) based on the Scheuer 
+    scoring system.
+    
+    Below, I load the data from the web.
+<<>>=
+fn<-"http://cipolli.com/students/data/biomarker.csv"
+dat <- read.csv(file=fn, header=TRUE, sep=",")
+head(dat)
+@
+In homework 0, you recreated Table 1 in \href{the paper}{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4932744/}. 
+Now, recreate Table 2.
+<<fig=TRUE>>=
+ggdat<-data.frame(fibrosis=dat$Fibrosis.Stage, MFAP4=dat$MFAP4.U.mL)
+ggplot(data=ggdat,aes(x=fibrosis, y=MFAP4, group=fibrosis))+
+  geom_violin(fill="lightblue")+
+  geom_boxplot(width=0.25)+
+  theme_bw()+
+  xlab("Fibrosis Stage")+
+  ylab("MFAP4")
+@
+
+<<>>=
+dat.f<-ggdat
+dat.f$fibrosis<-as.factor(dat.f$fibrosis)
+dat.f$MFAP4<-as.factor(dat.f$MFAP4)
+anova(lm(dat$MFAP4.U.mL~dat$Fibrosis.Stage))
+anova(lm(MFAP4.U.mL~Fibrosis.Stage, data=dat))
+TukeyHSD(aov(lm(dat$MFAP4.U.mL~as.factor(dat$Fibrosis.Stage)), conf.level = 0.95))
+@
+    \begin{table}[H]
+  \centering
+    \begin{tabular}{lccccc}\hline
+    Comparison & Difference & Lower Bound & Upper Bound & $p$ value\\\hline\hline
+    F1-F0                   &  &   &   &\\
+    F2-F0                   &  &   &   &\\
+    F3-F0                   &  &   &   &\\
+    F4-F0                   &  &   &   &\\
+    F2-F1                   &  &   &   &\\
+    F3-F1                   &  &   &   &\\
+    F4-F1                   &  &   &   &\\
+    F3-F2                   &  &   &   &\\
+    F4-F2                   &  &   &   &\\
+    F4-F3                   &  &   &   &\\\hline
+    \end{tabular}
+    \caption{Results of the pairwise comparisons of individual
+    hepatic fibrosis stages with  respect to MFAP4 values
+    after significant ANOVA result.} \label{MFAP4.ANOVA}
+  \end{table}
+** Are the results I get different from the table because the table uses log MFAP4 values?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item Complete the following parts. This will lead you through the simulation
+  of data, fitting regression lines and evaluating the assumptions.
+  \begin{enumerate}
+  \item Fit a model to the following simulated data. Make observations about
+  the model equation and the Pearson correlation.
+<< >>=
+n=500
+x<-sample(x = seq(0,5,0.01),size = n,replace = T)
+y<-5*x + 3
+plot(x,y)
+@
+
+<<>>=
+xy.mod<-lm(y~x) 
+summary(xy.mod) 
+cor(x,y, method = "pearson") #is the R squared the pearson correlation?
+@
+  \item Fit a model to the following simulated data, now with added Normal error. Make
+  observations about the model equation and the Pearson correlation in relation to (a).
+<< >>=
+e<-rnorm(n=n,mean=0,sd=3)
+y2<-5*x + 3 + e
+plot(x,y2)
+@
+
+<<>>=
+xy2.mod<-lm(y2~x)
+summary(xy2.mod)
+@
+  \item In the model of part (b), test for normality and constance of error terms. Note 
+  that we know both of these items to be true since we've taken $\epsilon \sim 
+  \textrm{N}(\mu=0,\sigma=3)$.
+<<fig=true>>=
+#check for normality - plots residuals
+ggdat<-data.frame(residuals=xy2.mod$residuals)
+g1<-ggplot(data=ggdat,aes(x=residuals))+
+  geom_histogram(aes(y=..density..),
+                 fill="lightblue",color="black",bins=8)+
+  geom_hline(yintercept=0)+
+  geom_density(fill="red", alpha = 0.2)+
+  theme_bw()+
+  xlab("Residuals")+
+  ylab("Density")
+
+library("qqplotr")
+g2<-ggplot(data=ggdat,aes(sample=residuals))+
+  stat_qq_band(alpha=0.25) +
+  stat_qq_line() +
+  stat_qq_point() +
+  theme_bw()+
+  xlab("Gaussian Quantiles")+
+  ylab("Sample Quantiles")
+
+grid.arrange(g1,g2,ncol=2)
+@
+
+<<>>=
+sum(xy2.mod$residuals) #close to zero
+@
+
+<<fig=true>>=
+#check constance - plot residuals against fitted values
+ggdat<-data.frame(residuals=xy2.mod$residuals,
+                  fitted=xy2.mod$fitted.values)
+ggplot(data=ggdat, aes(x=fitted, y=residuals))+
+  geom_point(shape=1) +
+  geom_hline(yintercept=0, linetype="dashed")+
+  theme_bw()+
+  xlab(bquote(hat(Y)))+
+  ylab("Residuals")
+@
+
+  \item Fit a model to the following simulated data, now with added exponential error.
+  Make observations about the model equation and the Pearson correlation in relation 
+  to the model of part (b).
+<< >>=
+e<-rexp(n=n,rate = 1/2)
+y3<-5*x + 3 + e
+plot(x,y3)
+@ 
+
+<<>>=
+xy3.mod<-lm(y3~x)
+summary(xy3.mod)
+@
+  \item In the model of part (d), test for normality and constance of error terms. Note
+  that we know that common variance is true but we've taken $\epsilon \sim 
+  \textrm{exp}(\beta=2)$.
+<<fig=true>>=
+#check for normality - plots residuals
+ggdat<-data.frame(residuals=xy3.mod$residuals)
+g1<-ggplot(data=ggdat,aes(x=residuals))+
+  geom_histogram(aes(y=..density..),
+                 fill="lightblue",color="black",bins=8)+
+  geom_hline(yintercept=0)+
+  geom_density(fill="red", alpha = 0.2)+
+  theme_bw()+
+  xlab("Residuals")+
+  ylab("Density")
+
+library("qqplotr")
+g2<-ggplot(data=ggdat,aes(sample=residuals))+
+  stat_qq_band(alpha=0.25) +
+  stat_qq_line() +
+  stat_qq_point() +
+  theme_bw()+
+  xlab("Gaussian Quantiles")+
+  ylab("Sample Quantiles")
+
+grid.arrange(g1,g2,ncol=2)
+@
+
+<<>>=
+sum(xy3.mod$residuals) #close to zero
+@
+
+<<fig=true>>=
+#check constance - plot residuals against fitted values
+ggdat<-data.frame(residuals=xy3.mod$residuals,
+                  fitted=xy3.mod$fitted.values)
+ggplot(data=ggdat, aes(x=fitted, y=residuals))+
+  geom_point(shape=1) +
+  geom_hline(yintercept=0, linetype="dashed")+
+  theme_bw()+
+  xlab(bquote(hat(Y)))+
+  ylab("Residuals")
+@
+  \item Fit a model to the following simulated data, now with added Heteroskedastic
+  normal error. Make observations about the model equation and the Pearson correlation
+  in relation to the model of part (b).
+<< >>=
+#order X to simulate non constant error
+x4<-x[order(x)]
+e<-rnorm(n=n,mean=0,sd=c(rep(1,n/2),rep(3,n/2)))
+y4<-5*x4 + 3 + e
+plot(x4,log(y4))
+@ 
+
+<<>>=
+x4y4.mod<-lm(y4~x4)
+summary(x4y4.mod)
+@
+  \item In the model of part (f), test for normality and constance of error terms. Note
+  that we know that normality of error terms is true, but $\epsilon \sim 
+  \textrm{N}(\mu=0,\sigma=1)$ for $x<\widehat{m}$ and $\epsilon \sim 
+  \textrm{N}(\mu=0,\sigma=3)$ for $x>\widehat{m}$.
+<<fig=true>>=
+#check for normality - plots residuals
+ggdat<-data.frame(residuals=x4y4.mod$residuals)
+g1<-ggplot(data=ggdat,aes(x=residuals))+
+  geom_histogram(aes(y=..density..),
+                 fill="lightblue",color="black",bins=8)+
+  geom_hline(yintercept=0)+
+  geom_density(fill="red", alpha = 0.2)+
+  theme_bw()+
+  xlab("Residuals")+
+  ylab("Density")
+
+library("qqplotr")
+g2<-ggplot(data=ggdat,aes(sample=residuals))+
+  stat_qq_band(alpha=0.25) +
+  stat_qq_line() +
+  stat_qq_point() +
+  theme_bw()+
+  xlab("Gaussian Quantiles")+
+  ylab("Sample Quantiles")
+
+grid.arrange(g1,g2,ncol=2)
+@
+
+<<>>=
+sum(x4y4.mod$residuals) #close to zero
+@
+
+<<fig=true>>=
+#check constance - plot residuals against fitted values
+ggdat<-data.frame(residuals=x4y4.mod$residuals,
+                  fitted=x4y4.mod$fitted.values)
+ggplot(data=ggdat, aes(x=fitted, y=residuals))+
+  geom_point(shape=1) +
+  geom_hline(yintercept=0, linetype="dashed")+
+  theme_bw()+
+  xlab(bquote(hat(Y)))+
+  ylab("Residuals")
+@
+\end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \item Consider the following simulation. This looks intimidating, but it's
+  a fairly simple exploration about what we'll talk about in class. This walks
+  you through ``seeing" what's going on in the background.
+  \begin{enumerate}
+    \item Plot the data simulated below. Assess the linear relationship.
+<<>>=
+set.seed(50)
+x_1<-sample(x=seq(0,100,0.01),size=50,replace=TRUE)
+e_1<-rnorm(n=50,mean=0,sd=5)
+y_1<-3.5+2.1*x_1 + e_1
+@
+
+<<>>=
+plot(x_1, y_1)
+@
+\begin{enumerate}
+    \item Write out the population model.
+    \begin{align*}
+      Y_i &= \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \epsilon 
+    \end{align*}
+    \item Fit the model based on the sample data and write out the sample model below.
+    \item Add the regression line to the plot in black, with lwd=2 and lty=3.
+    \item Check the assumptions of OLS for this model.
+    \item Interpret the $R^2$ of the model.
+    \item Interpret the overall $F$ test of the model. Report all 5 steps.
+    \item Interpret the coefficients of the model; are they what you would expect?
+\end{enumerate}
+  \item Now, let's add a bad datapoint to the data created in part (a).
+  \begin{enumerate}
+    \item Plot the data simulated below; ensure to plot the  Assess the linear relationship.
+<<>>=
+x_2<-c(x_1,100)
+y_2<-c(y_1,25)
+@
+    \item Fit the model based on the sample data and write out the sample model below.
+    \item Check the assumptions of OLS for this model.
+    \item Plot the data and regression lines from Questions 1-2. Add the regression line to the 
+    plot in red.
+    \item Interpret the coefficients of the model; are they what you would expect?
+\end{enumerate}
+  \item Continue with the data from Question b.
+\begin{enumerate}
+    \item Plot the residuals of your model against $x_2$ as well as the residuals 
+    against predicted.
+    \item Fit the appropriate model for estimating the weights for weighted least 
+    squares regression.
+    \item Provide a summary of the weights. How does the weight for the observation 
+    (100,25) compare to the other observations?
+    \item Use the weights from the previous part to fit a weighted least squares 
+    regression.
+    \item Check the assumptions of OLS for this model.
+    \item Plot the data and regression lines from Questions 1-2. Add the regression 
+    line to the plot in blue.
+    \item Interpret the coefficients of the model; are they what you would expect?
+  \end{enumerate}
+  \item Continue with the data from parts (b,c).
+  \begin{enumerate} 
+    \item Fit a robust regression using Huber-weighted iterated reweighted least 
+    squares and write out the sample model below.
+    \item Plot the data and regression lines from Questions 1-3. Add the regression
+    line to the plot in purple.
+    \item Interpret the coefficients of the model; are they what you would expect?
+  \end{enumerate}
+  \item Continue with the data from parts (b,c,d).
+  \begin{enumerate}
+    \item Fit a robust regression using Bisquare-weighted iterated reweighted 
+    least squares and write out the sample model below.
+    \item Plot the data and regression lines from Questions 1-4. Add the regression 
+    line to the plot in purple.
+    \item Interpret the coefficients of the model; are they what you would expect?
+  \end{enumerate}
+  \item Continue with the data from parts (b,c,d,e).
+\begin{enumerate}
+    \item Fit a quantile regression and write out the sample model below.
+    \item Plot the data and regression lines from Questions 1-5. Add the regression 
+    line to the plot in black
+    \item Interpret the coefficients of the model; are they what you would expect?
+  \end{enumerate}
+  \item Reflect on parts (a-f).
+  \begin{enumerate}
+    \item Which model is ``right"? If there's no one model 
+      that is ``right", which one is ``best"?
+    \item Rerun your code for Questions 1-6, but change the original sample size
+    from 50 to 1000. There's no need to redo all of the parts from those questions,
+    but discuss the difference. Look at the graph of the data with all the fitted
+    regression models and compare it to that from the original data.
+  \end{enumerate}
+  \end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  Question 5
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+    \item \textbf{Case Study} The MASS package in \texttt{R} \citep{MASS} provides data about housing values
+  in the Suburbs of Boston. The data provided is described below.
+  \begin{itemize}
+    \item \textbf{crim} -- per capita crime rate by town.
+    \item \textbf{zn} -- proportion of residential land zoned for lots over 25,000 sq.ft.
+    \item \textbf{indus} -- proportion of non-retail business acres per town.
+    \item \textbf{chas} -- Charles River dummy variable (= 1 if tract bounds river; 0 otherwise).
+    \item \textbf{nox} -- nitrogen oxides concentration (parts per 10 million).
+    \item \textbf{rm} -- average number of rooms per dwelling.
+    \item \textbf{age} -- proportion of owner-occupied units built prior to 1940.
+    \item \textbf{dis} -- weighted mean of distances to five Boston employment centres.
+    \item \textbf{rad} -- index of accessibility to radial highways.
+    \item \textbf{tax} -- full-value property-tax rate per \$10,000.
+    \item \textbf{ptratio} -- pupil-teacher ratio by town.
+    \item \textbf{black} -- $1000(Bk - 0.63)^2$ where $Bk$ is the proportion of blacks by town.
+    \item \textbf{lstat} -- lower status of the population (percent).
+    \item \textbf{medv} -- median value of owner-occupied homes in \$1000s.
+  \end{itemize}
+  You can load this data using
+<<>>=
+#install.packages("MASS",repos = "http://cloud.r-project.org/")
+library(MASS)
+data(Boston)
+@
+  Use your tools to build a regression model that predicts the median value of owner-occupied homes
+  in \$1000s based on the other variables in the data set.
+  
+<<>>=
+mod<-lm(formula = medv ~ crim +. , data = Boston)
+summary(mod)
+@
+
+<<>>=
+#remove statistically insignificant variables
+mod1<-lm(formula = medv ~ crim + zn + chas + nox + rm + dis + rad + tax + ptratio + black + lstat, data = Boston)
+summary(mod1)
+summary(mod1)$r.squared
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%  END!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{enumerate}
+\bibliography{bib}
+\end{document}

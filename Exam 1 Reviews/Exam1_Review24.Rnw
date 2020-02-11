@@ -1,0 +1,60 @@
+\documentclass{article}
+\usepackage{amsmath} %This allows me to use the align functionality.
+                     %If you find yourself trying to replicate
+                     %something you found online, ensure you're
+                     %loading the necessary packages!
+\usepackage{amsfonts}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{float}
+\usepackage{graphicx} 
+\usepackage{natbib} %For the bibliography
+\bibliographystyle{apalike}%For the bibliography
+\setlength\parindent{0pt}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\begin{center}
+  {\LARGE Review For Exam Number 1:24}\\\vspace{1em}
+\end{center}
+
+Overall, I was impressed with the quality of work that was created under a time constraint. The figures produced were clear and the analyses generally highlighted important insights into the data. I was especially impressed that analyses at the household and neighborhood level were included! Great job really reading deeply into the prompt.
+\newline
+
+There were a few general comments that I have that may be useful going forward. The first is that it is generally a good idea to comment code so that it's easier to follow what's going on. This also makes it easier for someone to go back and check their own work. Spacing out code and indenting also makes it easier to organize ideas and thoughts into chunks, which may help you easily figure out what parts of the problem you could have missed.
+\newline
+
+Also, don't be afraid to be direct and explicit in analyses. State exactly what you're trying to illustrate and it will be a lot easier to follow along and understand what questions are being addressed. Adding one or two sentences in the beginning will help the work seem more cohesive.
+\newline
+
+With a little more time, it might be nice to do a deeper analysis at the neighborhood level as well as the household level. Shedding light on HOA vs. non HOA homes looking at other factors like gardens and trees may prove to be useful. Expanding your neighborhood level analysis to a few factors may also enrich your analysis. \\
+
+\textbf{Major Comments:} 
+\begin{enumerate}
+  \item Page 0: The 14 missing tree values were not cleaned from the data. This means that your data may not be a representative sample.
+  \item Page 0: Summarizing the data before diving into the problem is important. It only takes one graph or table, but it makes a big difference. Maybe include a graph comparing in general the number of HOA homes versus non HOA homes in the sample? 
+  \item Page 10: I'm really impressed that you thought to begin to break down the analyses to a neighborhood level, excellent work. 
+\end{enumerate}
+
+\textbf{Minor Comments:} 
+\begin{enumerate}
+  \item Page 6, line 1: No citation for ggplot2
+  \item Page 6, line 2: I've never seen split before, nice!
+  \item Page 6, line 4: You did not address the NA "Recycle" variables. This leaves out an important aspect of recycling for the neighborhoods.
+  \item Page 6, line 5,6: Awesome job using prop.tables for your analysis.
+  \item Page 7, line 1,6: Be sure to include the y intercept for bar plots. 
+  \item Page 8, Figure 2, line 177: A better way to describe the graph may be to use the word "difference" instead of "change" since no change is actually occurring. 
+  \item Page 8, Figure 2: Can you deduce anymore information about HOA vs. nonHOA homes using the graphs?
+  \item Page 8, Figure 2: Good job pointing out the missing data, this is important for readers to know. 
+  \item Page 8, line 6, 11: If you have time, be sure to include what all of the numbers mean so that there's no room for interpretation. 
+  \item Page 8, line 3, 8: Be sure to include the y intercept for bar plots. 
+  \item Page 9, Figures 3,4: Awesome analyses! It was concise while still getting the major points across. This could be a great template for other figures. 
+\end{enumerate}
+
+\textbf{Typographical Comments:} 
+\begin{enumerate}
+  \item Page 7, Figure 1: Be sure to use proper capitalization for axes labels and the main title.
+  \item Page 7, Figure 2: Be sure to use proper capitalization for axes labels and the main title.
+  \item Page 9, Figure 3: Be sure to use proper capitalization for axes labels and the main title.
+  \item Page 9, Figure 4: Be sure to use proper capitalization for axes labels and the main title.
+\end{enumerate}
+
+\end{document}

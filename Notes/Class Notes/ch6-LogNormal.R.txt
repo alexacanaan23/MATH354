@@ -1,0 +1,58 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### Log Normal Distribution
+########################################################################
+dlnorm(x=0.50,meanlog=0,sdlog=1) #This the height of the PDF at x=0.50
+plnorm(q=0.25,meanlog=0,sdlog=1) #P(X<=0.250|mu=0,sd=1)
+qlnorm(p=0.90,meanlog=0,sdlog=1) #The 90th percentile
+rlnorm(n=5,meanlog=0,sdlog=1) #A random sample of 5 Xi~lognormals(mu=0,sd=1)
+
+ggdat<-data.frame(x=seq(0,6,0.001),
+                  f1=dlnorm(x=seq(0,6,0.001),meanlog=0,sdlog=1),
+                  f2=dlnorm(x=seq(0,6,0.001),meanlog=0,sdlog=0.25),
+                  f3=dlnorm(x=seq(0,6,0.001),meanlog=0,sdlog=0.5),
+                  f4=dlnorm(x=seq(0,6,0.001),meanlog=1,sdlog=1),
+                  f5=dlnorm(x=seq(0,6,0.001),meanlog=-1,sdlog=2))
+g1<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=f1,color="m=0 sdlog=1"))+
+  geom_line(aes(y=f2,color="m=0 sdlog=0.25"))+
+  geom_line(aes(y=f3,color="m=0 sdlog=0.50"))+
+  geom_line(aes(y=f4,color="m=1 sdlog=1"))+
+  geom_line(aes(y=f5,color="m=-1 sdlog=2"))+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(f[x](x)))+
+  ggtitle("Log-Normal PDF",subtitle="For Various Parameter Values")+
+  scale_color_discrete("",breaks=c("m=0 sdlog=1","m=0 sdlog=0.25","m=0 sdlog=0.50",
+                                   "m=1 sdlog=1","m=-1 sdlog=2"),
+                       labels=c(bquote(mu==0~","~sigma==0.50),
+                                bquote(mu==0~","~sigma==1),bquote(mu==0~","~sigma==0.25),
+                                bquote(mu==1~","~sigma==1),bquote(mu==-1~","~sigma==2)))
+
+
+ggdat<-data.frame(x=seq(0,6,0.001),
+                  F1=plnorm(q=seq(0,6,0.001),meanlog=0,sdlog=1),
+                  F2=plnorm(q=seq(0,6,0.001),meanlog=0,sdlog=0.25),
+                  F3=plnorm(q=seq(0,6,0.001),meanlog=0,sdlog=0.5),
+                  F4=plnorm(q=seq(0,6,0.001),meanlog=1,sdlog=1),
+                  F5=plnorm(q=seq(0,6,0.001),meanlog=-1,sdlog=2))
+g1.cdf<-ggplot(data=ggdat,aes(x=x))+
+  geom_line(aes(y=F1,color="m=0 sdlog=1"))+
+  geom_line(aes(y=F2,color="m=0 sdlog=0.25"))+
+  geom_line(aes(y=F3,color="m=0 sdlog=0.50"))+
+  geom_line(aes(y=F4,color="m=1 sdlog=1"))+
+  geom_line(aes(y=F5,color="m=-1 sdlog=2"))+
+  geom_hline(yintercept=0)+
+  theme_bw()+
+  xlab("X")+
+  ylab(bquote(F[x](x)))+
+  ggtitle("Log-Normal CDF",subtitle="For Various Parameter Values")+
+  scale_color_discrete("",breaks=c("m=0 sdlog=1","m=0 sdlog=0.25","m=0 sdlog=0.50",
+                                   "m=1 sdlog=1","m=-1 sdlog=2"),
+                       labels=c(bquote(mu==0~","~sigma==0.50),
+                                bquote(mu==0~","~sigma==1),bquote(mu==0~","~sigma==0.25),
+                                bquote(mu==1~","~sigma==1),bquote(mu==-1~","~sigma==2)))
+
+grid.arrange(g1,g1.cdf,ncol=2)

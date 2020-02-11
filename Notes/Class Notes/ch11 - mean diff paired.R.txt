@@ -1,0 +1,61 @@
+library("ggplot2")
+library("gridExtra")
+########################################################################
+#### Example Employees
+########################################################################
+
+#########################
+#### Load Data
+#########################
+dat.erg<-data.frame(individual=1:26,
+                    before=c(81.3,87.2,86.1,82.2,90.8,86.9,96.5,73,84.2,74.5,72,73.8,74.2,
+                             74.9,75.8,72.6,80.8,66.5,72.2,56.5,82.4,88.8,80.0,91.1,97.5,70),
+                    after=c(78.9,91.4,78.3,78.3,84.4,67.4,92.8,69.9,63.8,69.7,68.4,71.8,58.3,
+                            58.3,62.5,70.2,58.7,66.6,60.7,65,73.7,80.4,78.8,81.8,91.6,74.2))
+dat.erg$D<-dat.erg$before-dat.erg$after
+
+#########################
+#### Having R do it
+#########################
+t.test(x = dat.erg$D)
+
+#########################
+#### Check For Normality
+#########################
+library("qqplotr")
+ggplot(data=dat.erg,aes(sample=D))+
+  stat_qq_band(alpha=0.25) +
+  stat_qq_line() +
+  stat_qq_point() +
+  theme_bw()+
+  xlab("Gaussian Quantiles")+
+  ylab("Sample Quantiles")
+
+#########################
+#### Plot Confidence Interval
+#########################
+alpha<-0.05 #significance level
+test<-t.test(x = dat.erg$D)
+
+ggdat<-data.frame(t=seq(from=-4,to=4,by=0.01),
+                  f=dt(seq(from=-4,to=4,by=0.01),df=test$parameter))
+ggdat.highlight<-data.frame(x=qt(p = c(alpha/2,1-alpha/2),df=test$parameter),
+                            y=c(0,0))
+axis.labels<-round(c(qt(alpha/2,test$parameter),0,qt(1-alpha/2,test$parameter))*
+                     test$stderr + test$estimate,3)
+ggplot(data=ggdat,aes(x=t,y=f))+
+  geom_line()+
+  geom_ribbon(data=subset(ggdat,t<=qt(alpha/2,df=test$parameter)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+ 
+  geom_ribbon(data=subset(ggdat,t>=qt(1-alpha/2,df=test$parameter)),aes(ymax=f),ymin=0,
+              fill="grey",color=NA,alpha=0.5)+
+  geom_point(data=ggdat.highlight,aes(x=x,y=y))+
+  geom_hline(yintercept = 0)+
+  theme_bw()+
+  xlab("t")+
+  ylab("Density")+
+  annotate("text", x=-3.1, y=0.05, label= deparse(bquote(alpha/2==0.025)),parse=T,size=3.5)+ 
+  annotate("text", x=3.1, y=0.05, label= deparse(bquote(alpha/2==0.025)),parse=T,size=3.5)+
+  annotate("text", x=0, y=0.2, label= deparse(bquote(1-alpha==0.95)),parse=T,size=3.5)+
+  scale_x_continuous(sec.axis = sec_axis(~., breaks=c(qt(alpha/2,test$parameter),0,qt(1-alpha/2,test$parameter)),
+                                         labels = axis.labels,name="Difference Percentage of Time Arm Elevation Was Less than 30 Degrees")) 

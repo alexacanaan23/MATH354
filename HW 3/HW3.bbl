@@ -1,0 +1,49 @@
+\begin{thebibliography}{}
+
+\bibitem[Auguie, 2017]{gridExtra}
+Auguie, B. (2017).
+\newblock {\em gridExtra: Miscellaneous Functions for "Grid" Graphics}.
+\newblock R package version 2.3.
+
+\bibitem[Cheng et~al., 2019]{httpuv}
+Cheng, J., Bravo, H.~C., Ooms, J., and Chang, W. (2019).
+\newblock {\em httpuv: HTTP and WebSocket Server Library}.
+\newblock R package version 1.5.2.
+
+\bibitem[Dantas, 2019]{Rspotify}
+Dantas, T. (2019).
+\newblock {\em Rspotify: Access to Spotify API via R}.
+\newblock R package version 0.1.0.
+
+\bibitem[Hervé, 2019]{RVAideMemoire}
+Hervé, M. (2019).
+\newblock {\em RVAideMemoire: Testing and Plotting Procedures for
+  Biostatistics}.
+\newblock R package version 0.9-73.
+
+\bibitem[Jockers, 2015]{Syuzhet}
+Jockers, M.~L. (2015).
+\newblock {\em Syuzhet: Extract Sentiment and Plot Arcs from Text}.
+
+\bibitem[Mangiafico, 2019]{rcompanion}
+Mangiafico, S. (2019).
+\newblock {\em rcompanion: Functions to Support Extension Education Program
+  Evaluation}.
+\newblock R package version 2.3.7.
+
+\bibitem[Wickham, 2016]{ggplot2}
+Wickham, H. (2016).
+\newblock {\em ggplot2: Elegant Graphics for Data Analysis}.
+\newblock Springer-Verlag New York.
+
+\bibitem[Wickham, 2017]{tidyverse}
+Wickham, H. (2017).
+\newblock {\em tidyverse: Easily Install and Load the 'Tidyverse'}.
+\newblock R package version 1.2.1.
+
+\bibitem[Wickham, 2018]{scales}
+Wickham, H. (2018).
+\newblock {\em scales: Scale Functions for Visualization}.
+\newblock R package version 1.0.0.
+
+\end{thebibliography}
